@@ -48,6 +48,15 @@ cargo build --manifest-path apps/api/Cargo.toml --release
   * Do NOT use `React.forwardRef()`. Use `React.ComponentProps<'element'>` with `ref` as a normal prop.
   * Use `sonner` for toast notifications (`import { toast } from 'sonner'`).
   * Use `@theme` in `src/index.css` for Tailwind v4. Do NOT create `tailwind.config.js`.
+  * Wrap async data views with `StateBoundary` (`src/components/StateBoundary.tsx`) to guarantee 5-state UI completeness.
+* **7 Design Axioms (Anti-AI-Slop Protocol)**:
+  * **1. Typography Hierarchy over Box Soup**: Do not nest borders and cards inside cards. Establish structure using font size, font weight, and ink contrast before adding containers.
+  * **2. Color Discipline & Single Accent**: Keep surfaces dark neutral (`#090D16`, `#0B0F19`, `#1E293B`). Use only 1 brand accent (Cyan-500) and strict semantic states (Emerald, Rose, Amber). No rainbow palettes, glassmorphism, or multi-color gradients.
+  * **3. Layout Rhythm over 3-Card Grids**: Do not default every section to a generic 3-column card grid. Vary density, whitespace, asymmetric columns, and table/feed layouts based on data density.
+  * **4. Zero Data Slop & Earned Content**: Display only data that aids decision-making. No decorative fake percentages ("+12.4% vs last week"), ungrounded chart widgets, or placeholder KPI badges.
+  * **5. Functional Iconography Only**: Do not prepend random Lucide icons to every button and list item. Clear text labels and whitespace scanning come first.
+  * **6. 5-State UI Completeness**: Every view MUST handle Loading (skeleton), Empty (actionable callout), Error (recovery retry), Success, and Partial/Stale states via `StateBoundary`.
+  * **7. Token Grounding**: Reference design tokens from `src/index.css` (`@theme`). Never hardcode arbitrary inline hex/rgb colors.
 * **Type Safety**:
   * Import API DTOs from `@repo/api-client`. Do NOT hand-write duplicate TypeScript interfaces for backend responses.
   * Use `react-hook-form` with `zodResolver(schema)` for all modal and form inputs.
