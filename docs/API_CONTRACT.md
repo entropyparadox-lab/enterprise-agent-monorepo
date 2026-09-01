@@ -17,11 +17,38 @@ This executes:
 
 ## 2. API Endpoints Matrix
 
-### A. System & Health
+### A. Core: Authentication & Sessions
+* **`POST /api/auth/register`**
+  * Body: `RegisterRequest { email: string, name: string, password: string }`
+  * Response `201`: `AuthResponse { token: string, user: UserDto }`
+* **`POST /api/auth/login`**
+  * Body: `LoginRequest { email: string, password: string }`
+  * Response `200`: `AuthResponse { token: string, user: UserDto }` | `401`: `ErrorResponse`
+* **`GET /api/auth/me`**
+  * Headers: `Authorization: Bearer <token>`
+  * Response `200`: `UserDto` | `401`: `ErrorResponse`
+
+### B. Core: Enterprise Backoffice & RBAC (Admin Only)
+* **`GET /api/admin/users`**
+  * Response `200`: `Vec<UserDto>` | `403`: `ErrorResponse`
+* **`PUT /api/admin/users/{id}/role`**
+  * Body: `UpdateUserRoleRequest { role: "Admin" | "Operator" | "Viewer" }`
+  * Response `200`: `UserDto` | `403`: `ErrorResponse`
+* **`GET /api/admin/api-keys`**
+  * Response `200`: `Vec<ApiKeyInfo>` | `403`: `ErrorResponse`
+* **`POST /api/admin/api-keys`**
+  * Body: `CreateApiKeyRequest { name: string, role?: string }`
+  * Response `201`: `CreateApiKeyResponse { raw_key: string, key_info: ApiKeyInfo }` | `403`: `ErrorResponse`
+* **`DELETE /api/admin/api-keys/{id}`**
+  * Response `204`: No Content | `403`: `ErrorResponse`
+
+### C. Core: System Health & Audit Telemetry
 * **`GET /api/health`**
   * Response `200`: `HealthResponse { status: "HEALTHY", version: string, uptime_seconds: u64, database: string }`
+* **`GET /api/audit-logs`**
+  * Response `200`: `Vec<AuditLog>`
 
-### B. Orders Management (ERP)
+### D. Business Modules: Sample Record (Reference CRUD)
 * **`GET /api/orders`**
   * Query parameters: `search` (string), `status` (string), `limit` (i64), `offset` (i64)
   * Response `200`: `Vec<Order>`
@@ -37,10 +64,6 @@ This executes:
 * **`DELETE /api/orders/{id}`**
   * Response `204`: No Content | `404`: `ErrorResponse`
 
-### C. Audit Logs (SIEM)
-* **`GET /api/audit-logs`**
-  * Response `200`: `Vec<AuditLog>`
-
 ---
 
 ## 3. Standard Error Envelope
@@ -49,7 +72,7 @@ All API errors return a standard JSON envelope:
 
 ```json
 {
-  "error": "Resource not found: ORD-2026-9999",
-  "code": "NOT_FOUND"
+  "error": "Access denied: Admin privileges required",
+  "code": "FORBIDDEN"
 }
 ```
