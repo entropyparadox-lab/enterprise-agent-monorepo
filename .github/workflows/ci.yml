@@ -1,0 +1,63 @@
+name: Enterprise CI Verification
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend-verification:
+    name: Rust Backend (Axum 0.8 + SQLx)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/api -> target
+
+      - name: Check Formatting & Syntax
+        run: |
+          cargo fmt --manifest-path apps/api/Cargo.toml -- --check
+          cargo check --manifest-path apps/api/Cargo.toml
+
+      - name: Run Backend Integration Tests
+        run: cargo test --manifest-path apps/api/Cargo.toml
+
+  frontend-verification:
+    name: React 19 Frontend & OpenAPI Codegen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript Strict Typecheck
+        run: pnpm typecheck
+
+      - name: Production Client Build
+        run: pnpm build
+
+      - name: Verify Zero OpenAPI Drift
+        run: |
+          pnpm codegen
+          git diff --exit-code packages/api-client/src/schema.d.ts || (echo "❌ OpenAPI schema.d.ts is out of sync with Rust models. Run 'pnpm codegen' locally and commit." && exit 1)

@@ -1,0 +1,16 @@
+{
+  "name": "enterprise-agent-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm --filter \"./packages/*\" build && pnpm --filter \"./apps/*\" build",
+    "codegen": "cargo run --manifest-path apps/api/Cargo.toml -- --export-openapi > packages/api-client/src/openapi.json && pnpm --filter \"@repo/api-client\" codegen",
+    "typecheck": "pnpm --recursive --filter \"./apps/*\" --filter \"./packages/*\" typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.5.2",
+    "typescript": "^5.9.3"
+  }
+}

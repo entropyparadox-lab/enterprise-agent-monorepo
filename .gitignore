@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build artifacts
+dist/
+build/
+target/
+*.tsbuildinfo
+
+# SQLite DB files
+*.db
+*.db-wal
+*.db-shm
+
+# Environment & local files
+.env
+.env.local
+.DS_Store
