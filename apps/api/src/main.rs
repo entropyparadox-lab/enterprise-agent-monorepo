@@ -21,10 +21,10 @@ use utoipa_swagger_ui::SwaggerUi;
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Enterprise Agent-Native Backend Service")]
 pub struct Cli {
-    #[arg(short, long, default_value = "8080")]
+    #[arg(short, long, env = "PORT", default_value = "8080")]
     pub port: u16,
 
-    #[arg(short, long, default_value = "sqlite://enterprise.db")]
+    #[arg(short, long, env = "DATABASE_URL", default_value = "sqlite://enterprise.db")]
     pub db_url: String,
 
     #[arg(long, default_value_t = false)]

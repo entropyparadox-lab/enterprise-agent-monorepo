@@ -1,7 +1,7 @@
 # enterprise-agent-monorepo
 
-> **The Enterprise-Grade, Zero-Error Monorepo Template for AI-Native & Autonomous Coding Agents.**
-> Combining **React 19 (TypeScript + Vite 8 + Tailwind v4 + shadcn/ui)** with **Rust (Axum 0.8 + Tokio + SQLx SQLite WAL / Postgres)**.
+> **The Enterprise-Grade, Zero-Error Monorepo Template for AI-Native & Autonomous Coding Agents.**  
+> Combining **React 19 (TypeScript + Vite 8 + Tailwind v4 + shadcn/ui)** with **Rust (Axum 0.8 + Tokio + SQLx SQLite WAL / PostgreSQL)**.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Rust: Axum 0.8](https://img.shields.io/badge/Rust-Axum_0.8-orange.svg)](https://github.com/tokio-rs/axum)
@@ -13,7 +13,7 @@
 
 ---
 
-## ⚡ Why This Stack?
+## ⚡ Why This Architecture?
 
 This boilerplate is designed specifically for **Agent-Native Development (where AI coding agents write 80%+ of the code)** and **Hyper-Dense MicroVM / MOS Deployment**:
 
@@ -50,8 +50,50 @@ This boilerplate is designed specifically for **Agent-Native Development (where 
 | **UI Components** | **shadcn/ui + Radix UI** | Accessible, copy-paste headless components |
 | **Backend** | **Rust Axum 0.8 + Tokio** | Zero-GC, 4MB idle memory, 1ms cold-start on MicroVM |
 | **Database** | **SQLite 3 WAL ➔ PostgreSQL** | Zero-config single-file with ANSI SQL Postgres compatibility |
-| **Type Pipeline**| **Utoipa ➔ openapi-typescript** | `pnpm codegen` keeps frontend/backend types 100% in sync |
+| **Type Pipeline**| **Utoipa ➔ openapi-typescript** | `make codegen` keeps frontend/backend types 100% in sync |
 | **Process Control**| **Graceful Shutdown** | SIGINT/SIGTERM handlers safely flush SQLite WAL |
+
+---
+
+## 🌐 EntropyParadox Lab (`eplab`) Ecosystem Integration
+
+This monorepo integrates natively with the **EntropyParadox Lab high-performance developer tooling suite**:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    EntropyParadox Lab Ecosystem Tooling                 │
+├─────────────────────────────────────────────────────────────────────────┤
+│ 1. doc-engine (zig-doc-engine)                                          │
+│    • Sub-millisecond (1.2ms) offline FTS5 documentation search engine.  │
+│    • Grounding LLMs in exact lockfile APIs before code generation.      │
+│    • Command: `doc-engine search "enterprise react table zod"`          │
+├─────────────────────────────────────────────────────────────────────────┤
+│ 2. MOS (MicroVM Orchestration System)                                   │
+│    • Hyper-dense Firecracker microVM orchestrator.                      │
+│    • Deploys apps/api with <2ms boot time and 4MB memory footprint.     │
+│    • Command: `mos deploy --name my-app --exec ./target/release/api`     │
+├─────────────────────────────────────────────────────────────────────────┤
+│ 3. WebReflex (web-reflex)                                               │
+│    • 40ms replay browser action cache for automated UI regression QA.   │
+│    • Instant verification of frontend components without flakiness.     │
+├─────────────────────────────────────────────────────────────────────────┤
+│ 4. zenv & zlog                                                          │
+│    • Zero-allocation comptime environment and structured logging engine.│
+│    • Ultra-fast sidecar telemetry companion for Rust/Zig services.      │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Ecosystem Quick Start with `doc-engine`
+AI coding agents working in this repository use `doc-engine` to prevent hallucinations:
+```bash
+# 1. Search verified enterprise React & Axum templates
+doc-engine search "enterprise react table form zod" --lib react
+doc-engine search "Router State" --lib axum --ver 0.8
+
+# 2. Fetch full compilable boilerplate
+doc-engine get curated:enterprise-react-stack
+doc-engine get curated:axum-0.8
+```
 
 ---
 
@@ -88,7 +130,7 @@ Open:
 # Export OpenAPI & Sync TypeScript Types
 make codegen      # or: pnpm codegen
 
-# Strict Typecheck & Lint
+# Strict Typecheck & Fast Syntax Verification
 make check        # or: cargo check && pnpm typecheck
 
 # Run Integration Tests & E2E Verification
@@ -96,6 +138,9 @@ make test         # or: ./scripts/test.sh
 
 # Production Builds (Rust ELF Binary + React Client)
 make build        # or: pnpm build
+
+# Clean Artifacts & Temporary Databases
+make clean
 ```
 
 ---

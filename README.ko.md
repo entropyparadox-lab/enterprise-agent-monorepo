@@ -39,12 +39,44 @@
 
 ---
 
-## 🏆 핵심 아키텍처 특징
+## 🌐 엔트로피패러독스 연구소 (`eplab`) 생태계 도구 연동
 
-1. **AI 원샷 생성 성공률 극대화**: LLM 학습 데이터가 가장 풍부한 `React 19 + shadcn/ui`로 프론트엔드 AI 버그 발생률을 0%로 수축.
-2. **MOS 인프라 비용 75% 절감**: Node.js/Go 대비 1/4 수준인 **유휴 메모리 4MB, 1ms 콜드스타트**의 정적 Rust ELF 바이너리 구동.
-3. **타입 불일치 원천 소멸 (Zero Drift)**: `pnpm codegen` 명령 한 번으로 Rust 구조체(`utoipa`)가 프론트엔드 TypeScript 타입으로 자동 동기화.
-4. **SQLite WAL ➔ PostgreSQL 무중단 확장**: 기본 단일 파일 SQLite WAL로 빠른 개발 후, SQLx Repository 인터페이스를 통해 PostgreSQL 16+로 즉시 스왑 가능.
+본 모노레포는 엔트로피패러독스 연구소의 **초고성능 개발 도구군과 네이티브로 결합**되어 있습니다:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    엔트로피패러독스 Lab 생태계 도구 연동                │
+├─────────────────────────────────────────────────────────────────────────┤
+│ 1. doc-engine (zig-doc-engine)                                          │
+│    • 1.2ms 초고속 오프라인 FTS5 문서 검색 엔진.                         │
+│    • AI 에이전트가 코드 작성 전 락파일 기반 정확한 API/보일러플레이트 참조. │
+│    • 명령어: `doc-engine search "enterprise react table zod"`           │
+├─────────────────────────────────────────────────────────────────────────┤
+│ 2. MOS (MicroVM Orchestration System)                                   │
+│    • 초고밀도 Firecracker MicroVM 오케스트레이션 시스템.                │
+│    • apps/api 백엔드를 1ms 기동, 4MB 유휴 메모리로 초고속 Scale-to-Zero 배포.│
+│    • 명령어: `mos deploy --name my-app --exec ./target/release/api`     │
+├─────────────────────────────────────────────────────────────────────────┤
+│ 3. WebReflex (web-reflex)                                               │
+│    • 40ms 리플레이 브라우저 액션 캐시 기반 UI 자동화 QA 도구.           │
+│    • React 19 프론트엔드 비주얼 회귀 테스트 무결점 자동화.              │
+├─────────────────────────────────────────────────────────────────────────┤
+│ 4. zenv & zlog                                                          │
+│    • 제로 메모리 할당 컴파일 타임 환경설정 및 구조화 로거.              │
+│    • Rust/Zig 기반 마이크로서비스용 초경량 사이드카 텔레메트리.         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### `doc-engine`을 활용한 AI 환각 방지 프로토콜
+```bash
+# 1. 검증된 엔터프라이즈 React 및 Axum 템플릿 검색
+doc-engine search "enterprise react table form zod" --lib react
+doc-engine search "Router State" --lib axum --ver 0.8
+
+# 2. 컴파일러 0-에러 보일러플레이트 인출
+doc-engine get curated:enterprise-react-stack
+doc-engine get curated:axum-0.8
+```
 
 ---
 
@@ -72,6 +104,7 @@ make codegen    # OpenAPI 3.1 스펙 추출 및 TypeScript 타입 동기화
 make test       # Rust 인메모리 통합 테스트 + TypeScript strict 타입 검사
 make check      # 빠른 문법 및 타입 정적 분석
 make build      # Rust 릴리즈 바이너리 + React 클라이언트 프로덕션 빌드
+make clean      # 빌드 산출물 및 임시 DB 삭제
 ```
 
 ---
