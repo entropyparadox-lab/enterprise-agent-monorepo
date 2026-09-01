@@ -7,6 +7,8 @@
     "build": "pnpm --filter \"./packages/*\" build && pnpm --filter \"./apps/*\" build",
     "codegen": "cargo run --manifest-path apps/api/Cargo.toml -- --export-openapi > packages/api-client/src/openapi.json && pnpm --filter \"@repo/api-client\" codegen",
     "typecheck": "pnpm --recursive --filter \"./apps/*\" --filter \"./packages/*\" typecheck",
+    "test:visual": "pnpm --filter \"web\" test:visual",
+    "test:visual:update": "pnpm --filter \"web\" test:visual:update",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,md,css}\""
   },
   "devDependencies": {

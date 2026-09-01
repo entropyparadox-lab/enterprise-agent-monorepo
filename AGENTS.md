@@ -29,6 +29,9 @@ pnpm codegen
 # Typecheck all frontend & packages
 pnpm typecheck
 
+# Run Playwright visual regression tests
+make test-visual
+
 # Build frontend packages & apps for production
 pnpm build
 
