@@ -1,4 +1,4 @@
-use api::{create_app_router, db, handlers::AppState, openapi::ApiDoc};
+use api::{core::db, create_app_router, ApiDoc, AppState};
 use clap::Parser;
 use std::net::SocketAddr;
 use std::sync::atomic::AtomicU64;
@@ -29,14 +29,12 @@ pub struct Cli {
 async fn main() -> anyhow::Result<()> {
     let cli = Cli::parse();
 
-    // If --export-openapi is requested, dump OpenAPI JSON to stdout and exit
     if cli.export_openapi {
         let doc = ApiDoc::openapi();
         println!("{}", doc.to_pretty_json()?);
         return Ok(());
     }
 
-    // Initialize tracing subscriber
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
