@@ -28,11 +28,11 @@ pub struct ErrorResponse {
     pub code: String,
 }
 
-impl IntoResponse for AppError {
-    fn into_response(self) -> Response {
-        let (status, code, message) = match self {
-            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, "NOT_FOUND", msg),
-            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, "BAD_REQUEST", msg),
+impl AppError {
+    pub fn status_and_code(&self) -> (StatusCode, &'static str, String) {
+        match self {
+            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, "NOT_FOUND", msg.clone()),
+            AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, "BAD_REQUEST", msg.clone()),
             AppError::Database(err) => {
                 tracing::error!("Database error: {:?}", err);
                 (
@@ -49,13 +49,17 @@ impl IntoResponse for AppError {
                     "An unexpected error occurred".to_string(),
                 )
             }
-        };
+        }
+    }
+}
 
+impl IntoResponse for AppError {
+    fn into_response(self) -> Response {
+        let (status, code, message) = self.status_and_code();
         let body = Json(ErrorResponse {
             error: message,
             code: code.to_string(),
         });
-
         (status, body).into_response()
     }
 }
