@@ -1,8 +1,10 @@
 use api::{
+    core::{
+        db::init_db_pool,
+        handlers::AppState,
+        models::{ApiKeyInfo, AuthResponse, CreateApiKeyResponse, HealthResponse, UserDto},
+    },
     create_app_router,
-    db::init_db_pool,
-    handlers::AppState,
-    models::{ApiKeyInfo, AuthResponse, CreateApiKeyResponse, HealthResponse, UserDto},
 };
 use axum::{
     body::Body,

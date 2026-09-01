@@ -1,4 +1,4 @@
-use crate::error::AppError;
+use crate::core::error::AppError;
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
     Argon2,
@@ -22,13 +22,14 @@ pub async fn init_db_pool(db_url: &str) -> Result<SqlitePool, AppError> {
         .connect_with(opts)
         .await?;
 
-    run_migrations(&pool).await?;
+    run_core_migrations(&pool).await?;
+    crate::modules::sample_record::run_migrations(&pool).await?;
 
     Ok(pool)
 }
 
-async fn run_migrations(pool: &SqlitePool) -> Result<(), AppError> {
-    // 1. Users Table (Hybrid Auth: Email/PW + SSO + Zero Trust)
+async fn run_core_migrations(pool: &SqlitePool) -> Result<(), AppError> {
+    // 1. Users Table
     sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS users (
@@ -49,7 +50,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), AppError> {
     .execute(pool)
     .await?;
 
-    // 2. API Keys Table (M2M Scoped Tokens)
+    // 2. API Keys Table
     sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS api_keys (
@@ -67,27 +68,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), AppError> {
     .execute(pool)
     .await?;
 
-    // 3. Orders Table
-    sqlx::query(
-        r#"
-        CREATE TABLE IF NOT EXISTS orders (
-            id TEXT PRIMARY KEY,
-            client TEXT NOT NULL,
-            items TEXT NOT NULL,
-            amount INTEGER NOT NULL,
-            status TEXT NOT NULL DEFAULT '결제완료',
-            priority TEXT NOT NULL DEFAULT '보통',
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-        );
-        CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
-        CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at DESC);
-        "#,
-    )
-    .execute(pool)
-    .await?;
-
-    // 4. Audit Logs Table
+    // 3. Audit Logs Table
     sqlx::query(
         r#"
         CREATE TABLE IF NOT EXISTS audit_logs (
@@ -104,7 +85,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), AppError> {
     .execute(pool)
     .await?;
 
-    // 5. Seed initial admin user if empty
+    // 4. Seed initial admin user if empty
     let user_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM users")
         .fetch_one(pool)
         .await?;
@@ -140,8 +121,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), AppError> {
         .execute(pool)
         .await?;
 
-        // Seed initial mock M2M API key
-        // Raw key: ep_live_a1b2c3d4e5f6
+        // Seed default M2M API key
         let hash = sha256_hex("ep_live_a1b2c3d4e5f6");
         sqlx::query(
             r#"
@@ -151,24 +131,6 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), AppError> {
         )
         .bind(hash)
         .bind(&now)
-        .execute(pool)
-        .await?;
-    }
-
-    // 6. Seed initial orders if empty
-    let order_count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM orders")
-        .fetch_one(pool)
-        .await?;
-
-    if order_count.0 == 0 {
-        sqlx::query(
-            r#"
-            INSERT INTO orders (id, client, items, amount, status, priority, created_at, updated_at) VALUES
-            ('ORD-2026-0891', '엔트로피패러독스', 'AOT 가속 모듈 4EA', 4850000, '결제완료', '높음', '2026-09-01 10:00:00', '2026-09-01 10:00:00'),
-            ('ORD-2026-0892', '메타오가닉 코리아', 'KTCC 5대 지표 분석 센서', 12500000, '배송준비', '높음', '2026-08-31 15:30:00', '2026-08-31 15:30:00'),
-            ('ORD-2026-0893', '아진글로벌 시스템', 'Vision AI 엣지 게이트웨이', 8900000, '출고완료', '보통', '2026-08-30 09:15:00', '2026-08-30 09:15:00');
-            "#,
-        )
         .execute(pool)
         .await?;
 

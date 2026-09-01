@@ -12,7 +12,7 @@
     "/api/admin/api-keys": {
       "get": {
         "tags": [
-          "handlers"
+          "admin"
         ],
         "operationId": "list_api_keys",
         "responses": {
@@ -36,7 +36,7 @@
       },
       "post": {
         "tags": [
-          "handlers"
+          "admin"
         ],
         "operationId": "create_api_key",
         "requestBody": {
@@ -69,7 +69,7 @@
     "/api/admin/api-keys/{id}": {
       "delete": {
         "tags": [
-          "handlers"
+          "admin"
         ],
         "operationId": "revoke_api_key",
         "parameters": [
@@ -98,7 +98,7 @@
     "/api/admin/users": {
       "get": {
         "tags": [
-          "handlers"
+          "admin"
         ],
         "operationId": "list_admin_users",
         "responses": {
@@ -124,7 +124,7 @@
     "/api/admin/users/{id}/role": {
       "put": {
         "tags": [
-          "handlers"
+          "admin"
         ],
         "operationId": "update_user_role",
         "parameters": [
@@ -170,7 +170,7 @@
     "/api/audit-logs": {
       "get": {
         "tags": [
-          "handlers"
+          "system"
         ],
         "operationId": "list_audit_logs",
         "responses": {
@@ -193,7 +193,7 @@
     "/api/auth/login": {
       "post": {
         "tags": [
-          "handlers"
+          "auth"
         ],
         "operationId": "login",
         "requestBody": {
@@ -226,7 +226,7 @@
     "/api/auth/me": {
       "get": {
         "tags": [
-          "handlers"
+          "auth"
         ],
         "operationId": "get_current_user",
         "responses": {
@@ -249,7 +249,7 @@
     "/api/auth/register": {
       "post": {
         "tags": [
-          "handlers"
+          "auth"
         ],
         "operationId": "register",
         "requestBody": {
@@ -282,7 +282,7 @@
     "/api/health": {
       "get": {
         "tags": [
-          "handlers"
+          "system"
         ],
         "operationId": "get_health",
         "responses": {
@@ -302,7 +302,7 @@
     "/api/orders": {
       "get": {
         "tags": [
-          "handlers"
+          "orders"
         ],
         "operationId": "list_orders",
         "parameters": [
@@ -363,7 +363,7 @@
       },
       "post": {
         "tags": [
-          "handlers"
+          "orders"
         ],
         "operationId": "create_order",
         "requestBody": {
@@ -393,7 +393,7 @@
     "/api/orders/{id}": {
       "get": {
         "tags": [
-          "handlers"
+          "orders"
         ],
         "operationId": "get_order",
         "parameters": [
@@ -425,7 +425,7 @@
       },
       "put": {
         "tags": [
-          "handlers"
+          "orders"
         ],
         "operationId": "update_order",
         "parameters": [
@@ -466,7 +466,7 @@
       },
       "delete": {
         "tags": [
-          "handlers"
+          "orders"
         ],
         "operationId": "delete_order",
         "parameters": [
@@ -829,19 +829,19 @@
   "tags": [
     {
       "name": "auth",
-      "description": "Authentication & User Sessions"
+      "description": "Core Authentication & Sessions"
     },
     {
       "name": "admin",
-      "description": "Enterprise Backoffice & Permissions"
-    },
-    {
-      "name": "orders",
-      "description": "ERP & Business Core"
+      "description": "Core Backoffice & RBAC"
     },
     {
       "name": "system",
-      "description": "Health & Telemetry"
+      "description": "Core Health & System Telemetry"
+    },
+    {
+      "name": "orders",
+      "description": "Sample Business Domain Module (Reference CRUD)"
     }
   ]
 }

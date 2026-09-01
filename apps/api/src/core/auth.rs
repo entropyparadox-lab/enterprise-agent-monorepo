@@ -1,4 +1,4 @@
-use crate::{
+use crate::core::{
     db::sha256_hex,
     error::AppError,
     handlers::AppState,
@@ -109,7 +109,6 @@ impl FromRequestParts<Arc<AppState>> for AuthUser {
             }
         }
 
-        // 3. Fallback: Guest / Default for public demo endpoints if unauthenticated
         Err(AppError::Unauthorized(
             "Missing Bearer authentication token".to_string(),
         ))
