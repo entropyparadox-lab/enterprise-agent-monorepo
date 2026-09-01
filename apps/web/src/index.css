@@ -2,32 +2,52 @@
 
 @theme {
   /* ========================================================================= */
-  /* Enterprise Pure Light Editorial Design Tokens                             */
+  /* Enterprise 3-Tier Semantic Design Tokens (Stripe/Linear Standard)         */
   /* ========================================================================= */
 
-  /* Palette: Crisp Light Base + Single Cyan/Blue brand accent */
+  /* 1. Surface Hierarchy (Canvas & Panels) */
+  --color-surface-canvas: #f8fafc;
+  --color-surface-panel: #ffffff;
+  --color-surface-subtle: #f1f5f9;
+  --color-surface-hover: #f8fafc;
+  --color-surface-border: #e2e8f0;
+  --color-surface-border-subtle: #cbd5e1;
+
+  /* 2. Ink Hierarchy (High-Contrast Typography) */
+  --color-ink-title: #0f172a;
+  --color-ink-body: #334155;
+  --color-ink-muted: #64748b;
+  --color-ink-disabled: #94a3b8;
+
+  /* 3. Brand Accent (5% High-Signal Focus) */
   --color-brand-primary: #0891b2;
   --color-brand-primary-hover: #0e7490;
   --color-brand-secondary: #2563eb;
+  --color-brand-subtle: #ecfeff;
+  --color-brand-border: #a5f3fc;
 
-  /* Surfaces & Canvas (Light Theme) */
-  --color-surface-base: #f8fafc;
-  --color-surface-card: #ffffff;
-  --color-surface-card-hover: #f1f5f9;
-  --color-surface-border: #e2e8f0;
-  --color-surface-border-subtle: #cbd5e1;
-  --color-ink-primary: #0f172a;
-  --color-ink-secondary: #475569;
-  --color-ink-muted: #64748b;
+  /* 4. Semantic Status Tokens (Strict 3-State) */
+  --color-status-success: #059669;
+  --color-status-success-bg: #ecfdf5;
+  --color-status-success-border: #a7f3d0;
 
-  /* Typography */
+  --color-status-warning: #d97706;
+  --color-status-warning-bg: #fffbeb;
+  --color-status-warning-border: #fde68a;
+
+  --color-status-danger: #e11d48;
+  --color-status-danger-bg: #fff1f2;
+  --color-status-danger-border: #fecdd3;
+
+  /* 5. Typography */
   --font-display: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Controlled Radius */
+  /* 6. Controlled Radius Scale */
   --radius-card: 0.75rem;
   --radius-button: 0.5rem;
   --radius-badge: 0.375rem;
+  --radius-input: 0.5rem;
 }
 
 @layer base {
@@ -35,7 +55,7 @@
     margin: 0;
     font-family: var(--font-display);
     -webkit-font-smoothing: antialiased;
-    background-color: var(--color-surface-base);
-    color: var(--color-ink-primary);
+    background-color: var(--color-surface-canvas);
+    color: var(--color-ink-title);
   }
 }
