@@ -9,6 +9,164 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/admin/api-keys": {
+      "get": {
+        "tags": [
+          "handlers"
+        ],
+        "operationId": "list_api_keys",
+        "responses": {
+          "200": {
+            "description": "List all issued API keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApiKeyInfo"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Admin only"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "handlers"
+        ],
+        "operationId": "create_api_key",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApiKeyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "API Key issued successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateApiKeyResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Admin only"
+          }
+        }
+      }
+    },
+    "/api/admin/api-keys/{id}": {
+      "delete": {
+        "tags": [
+          "handlers"
+        ],
+        "operationId": "revoke_api_key",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "API Key revoked"
+          },
+          "403": {
+            "description": "Forbidden: Admin only"
+          },
+          "404": {
+            "description": "API Key not found"
+          }
+        }
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": [
+          "handlers"
+        ],
+        "operationId": "list_admin_users",
+        "responses": {
+          "200": {
+            "description": "List all enterprise users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Admin only"
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}/role": {
+      "put": {
+        "tags": [
+          "handlers"
+        ],
+        "operationId": "update_user_role",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRoleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "User role updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Admin only"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
     "/api/audit-logs": {
       "get": {
         "tags": [
@@ -28,6 +186,95 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "handlers"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": [
+          "handlers"
+        ],
+        "operationId": "get_current_user",
+        "responses": {
+          "200": {
+            "description": "Current authenticated user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "handlers"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request or email already exists"
           }
         }
       }
@@ -245,6 +492,37 @@
   },
   "components": {
     "schemas": {
+      "ApiKeyInfo": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "key_prefix",
+          "role",
+          "created_at",
+          "is_active"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "key_prefix": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
       "AuditLog": {
         "type": "object",
         "required": [
@@ -273,6 +551,53 @@
             "type": "string"
           },
           "user_name": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "user"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserDto"
+          }
+        }
+      },
+      "CreateApiKeyRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CreateApiKeyResponse": {
+        "type": "object",
+        "required": [
+          "raw_key",
+          "key_info"
+        ],
+        "properties": {
+          "key_info": {
+            "$ref": "#/components/schemas/ApiKeyInfo"
+          },
+          "raw_key": {
             "type": "string"
           }
         }
@@ -343,6 +668,21 @@
           }
         }
       },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
       "Order": {
         "type": "object",
         "required": [
@@ -383,6 +723,25 @@
           }
         }
       },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "name",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
       "UpdateOrderRequest": {
         "type": "object",
         "properties": {
@@ -418,13 +777,71 @@
             ]
           }
         }
+      },
+      "UpdateUserRoleRequest": {
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "UserDto": {
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role",
+          "auth_type",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "auth_type": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
       }
     }
   },
   "tags": [
     {
-      "name": "enterprise-api",
-      "description": "Enterprise Vibe-Coding Backend API"
+      "name": "auth",
+      "description": "Authentication & User Sessions"
+    },
+    {
+      "name": "admin",
+      "description": "Enterprise Backoffice & Permissions"
+    },
+    {
+      "name": "orders",
+      "description": "ERP & Business Core"
+    },
+    {
+      "name": "system",
+      "description": "Health & Telemetry"
     }
   ]
 }

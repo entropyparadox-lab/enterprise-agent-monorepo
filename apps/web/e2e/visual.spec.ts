@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Frontend Visual Regression Tests', () => {
   test.beforeEach(async ({ page }) => {
-    // Mock the backend API endpoints so visual snapshots are 100% deterministic
+    // Mock backend API endpoints
     await page.route('/api/health', async (route) => {
       await route.fulfill({
         status: 200,
@@ -13,6 +13,69 @@ test.describe('Frontend Visual Regression Tests', () => {
           uptime_seconds: 42,
           database: 'CONNECTED_SQLITE_WAL',
         }),
+      })
+    })
+
+    await page.route('/api/auth/login', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          token: 'mock-jwt-token-admin',
+          user: {
+            id: 'USR-0001',
+            email: 'admin@enterprise.local',
+            name: '최고 관리자 (Admin)',
+            role: 'Admin',
+            auth_type: 'Password',
+            status: 'Active',
+            created_at: '2026-09-01 10:00:00',
+          },
+        }),
+      })
+    })
+
+    await page.route('/api/admin/users', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 'USR-0001',
+            email: 'admin@enterprise.local',
+            name: '최고 관리자 (Admin)',
+            role: 'Admin',
+            auth_type: 'Password',
+            status: 'Active',
+            created_at: '2026-09-01 10:00:00',
+          },
+          {
+            id: 'USR-0002',
+            email: 'operator@enterprise.local',
+            name: '운영 리드 (Operator)',
+            role: 'Operator',
+            auth_type: 'Password',
+            status: 'Active',
+            created_at: '2026-09-01 10:00:00',
+          },
+        ]),
+      })
+    })
+
+    await page.route('/api/admin/api-keys', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          {
+            id: 'KEY-0001',
+            name: 'Hermes CI Worker Bot',
+            key_prefix: 'ep_live_a1b2',
+            role: 'Admin',
+            created_at: '2026-09-01 10:00:00',
+            is_active: true,
+          },
+        ]),
       })
     })
 
@@ -40,16 +103,6 @@ test.describe('Frontend Visual Regression Tests', () => {
             priority: '높음',
             created_at: '2026-08-31 15:30:00',
             updated_at: '2026-08-31 15:30:00',
-          },
-          {
-            id: 'ORD-2026-0893',
-            client: '아진글로벌 시스템',
-            items: 'Vision AI 엣지 게이트웨이',
-            amount: 8900000,
-            status: '출고완료',
-            priority: '보통',
-            created_at: '2026-08-30 09:15:00',
-            updated_at: '2026-08-30 09:15:00',
           },
         ]),
       })
@@ -102,6 +155,20 @@ test.describe('Frontend Visual Regression Tests', () => {
     await page.setViewportSize({ width: 390, height: 844 })
     await expect(page.locator('header')).toBeVisible()
     await expect(page).toHaveScreenshot('mobile-viewport.png', {
+      maxDiffPixelRatio: 0.02,
+    })
+  })
+
+  test('5. Backoffice Admin Control Plane View Snapshot', async ({ page }) => {
+    // Login as admin first
+    await page.click('button:has-text("로그인 / SSO")')
+    await page.click('button:has-text("최고 관리자(Admin) 원클릭 로그인")')
+    await expect(page.locator('header span:has-text("최고 관리자")')).toBeVisible()
+
+    // Switch to Backoffice Tab
+    await page.click('button:has-text("5. 백오피스")')
+    await expect(page.locator('text=전사 사용자 권한 & M2M API Key 총괄 관리')).toBeVisible()
+    await expect(page).toHaveScreenshot('backoffice-admin-view.png', {
       maxDiffPixelRatio: 0.02,
     })
   })
