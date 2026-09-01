@@ -13,9 +13,9 @@
 
 ---
 
-## ⚡ Why This Architecture?
+## ⚡ Architecture & Philosophy
 
-This boilerplate is designed specifically for **Agent-Native Development (where AI coding agents write 80%+ of the code)** and **Hyper-Dense MicroVM / MOS Deployment**:
+This boilerplate is engineered for **Agent-Native Development (where AI coding agents write 80%+ of code)** with strict compiler verification and hyper-dense server execution:
 
 ```
 ┌────────────────────────────────────────────────────────┐
@@ -35,75 +35,29 @@ This boilerplate is designed specifically for **Agent-Native Development (where 
 │ [Backend] apps/api (Rust Axum 0.8.x + Tokio)           │
 │  • Utoipa OpenAPI 3.1 + Serde + Tracing                │
 │  • SQLx 0.8 SQLite (WAL mode) ➔ Postgres 16+ Portable  │
-│  • Hyper-dense MicroVM execution (1ms boot, 4MB RSS)   │
+│  • Scale-to-Zero MicroVM execution (1ms boot, 4MB RSS) │
 └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🏆 Key Architecture Highlights
+## 🏆 Key Features
 
-| Layer | Technology | Key Advantage |
-| :--- | :--- | :--- |
-| **Frontend** | **React 19 + Vite 8 + TS** | 99%+ AI one-shot accuracy, 380ms production build |
-| **Styling** | **Tailwind CSS v4 + Pretendard** | CSS-first `@theme` syntax, zero config bloat |
-| **UI Components** | **shadcn/ui + Radix UI** | Accessible, copy-paste headless components |
-| **Backend** | **Rust Axum 0.8 + Tokio** | Zero-GC, 4MB idle memory, 1ms cold-start on MicroVM |
-| **Database** | **SQLite 3 WAL ➔ PostgreSQL** | Zero-config single-file with ANSI SQL Postgres compatibility |
-| **Type Pipeline**| **Utoipa ➔ openapi-typescript** | `make codegen` keeps frontend/backend types 100% in sync |
-| **Process Control**| **Graceful Shutdown** | SIGINT/SIGTERM handlers safely flush SQLite WAL |
-
----
-
-## 🌐 EntropyParadox Lab (`eplab`) Ecosystem Integration
-
-This monorepo integrates natively with the **EntropyParadox Lab high-performance developer tooling suite**:
-
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                    EntropyParadox Lab Ecosystem Tooling                 │
-├─────────────────────────────────────────────────────────────────────────┤
-│ 1. doc-engine (zig-doc-engine)                                          │
-│    • Sub-millisecond (1.2ms) offline FTS5 documentation search engine.  │
-│    • Grounding LLMs in exact lockfile APIs before code generation.      │
-│    • Command: `doc-engine search "enterprise react table zod"`          │
-├─────────────────────────────────────────────────────────────────────────┤
-│ 2. MOS (MicroVM Orchestration System)                                   │
-│    • Hyper-dense Firecracker microVM orchestrator.                      │
-│    • Deploys apps/api with <2ms boot time and 4MB memory footprint.     │
-│    • Command: `mos deploy --name my-app --exec ./target/release/api`     │
-├─────────────────────────────────────────────────────────────────────────┤
-│ 3. WebReflex (web-reflex)                                               │
-│    • 40ms replay browser action cache for automated UI regression QA.   │
-│    • Instant verification of frontend components without flakiness.     │
-├─────────────────────────────────────────────────────────────────────────┤
-│ 4. zenv & zlog                                                          │
-│    • Zero-allocation comptime environment and structured logging engine.│
-│    • Ultra-fast sidecar telemetry companion for Rust/Zig services.      │
-└─────────────────────────────────────────────────────────────────────────┘
-```
-
-### Ecosystem Quick Start with `doc-engine`
-AI coding agents working in this repository use `doc-engine` to prevent hallucinations:
-```bash
-# 1. Search verified enterprise React & Axum templates
-doc-engine search "enterprise react table form zod" --lib react
-doc-engine search "Router State" --lib axum --ver 0.8
-
-# 2. Fetch full compilable boilerplate
-doc-engine get curated:enterprise-react-stack
-doc-engine get curated:axum-0.8
-```
+* **Zero-Drift Type Pipeline**: `make codegen` automatically extracts OpenAPI 3.1 specs from Rust structs and compiles type-safe TypeScript definitions (`schema.d.ts`).
+* **99%+ AI One-Shot Accuracy**: Standardized on React 19 + shadcn/ui, minimizing LLM hallucination and syntax degradation.
+* **Extreme Resource Efficiency**: Rust Axum backend consumes only **4~8MB idle memory** with sub-2ms cold-start latency.
+* **SQLite WAL ➔ PostgreSQL Portability**: Ships with zero-config SQLite WAL mode for instant local hacking, structured with ANSI SQL for zero-friction migration to PostgreSQL 16+.
+* **Production-Grade Resilience**: Built-in SIGINT/SIGTERM graceful shutdown, React Error Boundary, and strictly frozen lockfiles (`Cargo.lock`, `pnpm-lock.yaml`).
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Requirements
+### 1. Prerequisites
 * **Node.js**: `v22+` or `v24+` (with `pnpm v10+`)
 * **Rust**: `1.85+` (stable with `cargo`)
 
-### 2. Installation & Concurrent Dev
+### 2. Installation & Concurrent Development
 ```bash
 # Clone the repository
 git clone https://github.com/entropyparadox-lab/enterprise-agent-monorepo.git
@@ -114,34 +68,40 @@ pnpm install
 
 # Start both Rust Backend (:8080) and React Frontend (:3000)
 make dev
-# or: ./scripts/dev.sh
 ```
 
-Open:
+Open in your browser:
 * **Frontend**: `http://localhost:3000`
 * **Axum API**: `http://localhost:8080/api/health`
-* **Swagger UI**: `http://localhost:8080/swagger-ui`
+* **Swagger OpenAPI Docs**: `http://localhost:8080/swagger-ui`
 
 ---
 
 ## 🛠️ Common Commands
 
-```bash
-# Export OpenAPI & Sync TypeScript Types
-make codegen      # or: pnpm codegen
+| Command | Action |
+| :--- | :--- |
+| **`make dev`** | Run Rust API (:8080) and React client (:3000) concurrently with unified trap exit |
+| **`make codegen`** | Extract OpenAPI 3.1 from Rust and compile TypeScript schema definitions |
+| **`make test`** | Run isolated in-memory Rust integration tests and strict TypeScript typecheck |
+| **`make check`** | Fast compiler syntax check (`cargo check` + `pnpm typecheck`) |
+| **`make build`** | Build optimized production Rust ELF binary and React Vite client |
+| **`make clean`** | Remove build artifacts and temporary databases |
 
-# Strict Typecheck & Fast Syntax Verification
-make check        # or: cargo check && pnpm typecheck
+---
 
-# Run Integration Tests & E2E Verification
-make test         # or: ./scripts/test.sh
+## 🚢 Deployment Options
 
-# Production Builds (Rust ELF Binary + React Client)
-make build        # or: pnpm build
+`enterprise-agent-monorepo` compiles into a standalone static frontend bundle and a single native binary:
 
-# Clean Artifacts & Temporary Databases
-make clean
-```
+1. **Bare Metal / Linux Server**:
+   ```bash
+   PORT=8080 DATABASE_URL=sqlite://prod.db ./target/release/api
+   ```
+2. **MicroVM / MOS (Scale-to-Zero)**:
+   * Optimized for Firecracker/MOS MicroVMs with **<2ms cold starts** and **4MB idle memory**.
+3. **Docker / Containers**:
+   * Multi-stage build pairing a distroless Rust runner with static Nginx/Caddy hosting.
 
 ---
 
@@ -152,8 +112,8 @@ All architectural specifications are codified in `docs/`:
 * **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**: Monorepo boundaries, network topology, ports.
 * **[docs/DATABASE_SCHEMA.md](docs/DATABASE_SCHEMA.md)**: SQLite WAL mode configuration & PostgreSQL portability rules.
 * **[docs/API_CONTRACT.md](docs/API_CONTRACT.md)**: REST endpoints, OpenAPI schemas, unified error envelope.
-* **[docs/VIBE_CODING_RULES.md](docs/VIBE_CODING_RULES.md)**: Negative guidance & 2-step doc-engine compiler protocol.
-* **[docs/AGENT_GUIDE.md](docs/AGENT_GUIDE.md)**: Comprehensive guide for AI coding agents.
+* **[docs/VIBE_CODING_RULES.md](docs/VIBE_CODING_RULES.md)**: AI agent guardrails and negative guidance.
+* **[docs/AGENT_GUIDE.md](docs/AGENT_GUIDE.md)**: Comprehensive operating instructions for AI coding agents.
 
 ---
 
