@@ -85,7 +85,7 @@ async fn run_migrations(pool: &SqlitePool) -> Result<(), AppError> {
             r#"
             INSERT INTO audit_logs (log_type, user_name, action, status, created_at) VALUES
             ('deploy', '성호 (DevOps)', 'Cluster #04 zgate hot-patch applied', 'SUCCESS', '2026-09-01 12:00:00'),
-            ('security', 'Security Guard', 'Blocked unauthenticated RPC request from 192.168.1.42', 'BLOCKED', '2026-09-01 11:45:00'),
+            ('security', 'Security Guard', 'Blocked unauthenticated RPC request from 203.0.113.42', 'BLOCKED', '2026-09-01 11:45:00'),
             ('deploy', '지수 (AI Lead)', 'Model pipeline weight re-anchored to Claude 3.7', 'SUCCESS', '2026-09-01 11:00:00'),
             ('security', 'IAM Policy', 'Ephemeral MicroVM sandbox #982 cleared', 'SUCCESS', '2026-09-01 09:30:00');
             "#,
