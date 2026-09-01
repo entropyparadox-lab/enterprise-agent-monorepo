@@ -9,9 +9,10 @@ This document is the Single Source of Truth (SSOT) defining the enterprise archi
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │ [Frontend] apps/web (React 19.x + Vite 8.x + Tailwind CSS v4)          │
+│  • Feature Slice Architecture (features/<domain>/)                     │
 │  • shadcn/ui + TanStack Table v8 + TanStack Query v5                   │
 │  • React Hook Form + Zod + Sonner + useAuthStore (Zustand)             │
-│  • 5 Domain Views: Backoffice Control Plane, ERP Grid, SIEM, Landing   │
+│  • 5 Domain Slices: Admin Control Plane, ERP Grid, SIEM, Landing, Service│
 └──────────────────────────────────┬─────────────────────────────────────┘
                                    │ (OpenAPI 3.1 Type-Safe Fetch)
                                    ▼
@@ -31,8 +32,11 @@ This document is the Single Source of Truth (SSOT) defining the enterprise archi
 
 ---
 
-## 2. Agent-Native Vertical Slice Directory Structure
+## 2. Agent-Native Symmetrical Vertical Slice Structure
 
+Both Backend and Frontend follow **symmetrical, self-contained feature slicing** to prevent monolithic God files.
+
+### A. Backend (`apps/api/src/`)
 ```
 apps/api/src/
 ├── core/                                # 🛡️ [Immutable Enterprise Core]
@@ -56,70 +60,62 @@ apps/api/src/
 └── main.rs                              # CLI binary, SQLite connection & Graceful Shutdown
 ```
 
+### B. Frontend (`apps/web/src/`)
+```
+apps/web/src/
+├── core/ or lib/                        # 🛡️ [Client Infrastructure Core]
+│   ├── api.ts                           # API client instance with Bearer interceptor
+│   ├── authStore.ts                     # Zustand global user session store
+│   ├── env.ts                           # Type-safe Zod runtime environment validation
+│   ├── utils.ts                         # Tailwind clsx/twMerge helper
+│   └── components/                      # StateBoundary (5-state UI guard), ErrorBoundary
+│
+├── features/                            # 🚀 [Frontend Feature Slices (1 Folder = 1 Domain)]
+│   ├── admin/                           # AdminView.tsx (User Directory, API Keys, Modals)
+│   ├── sample_record/                   # OrderGridView.tsx (Order table, Zod modal, edit dialog)
+│   ├── saas/                            # SaasSiemView.tsx (SIEM audit logs)
+│   ├── cinematic/                       # CinematicView.tsx
+│   ├── service/                         # ServiceView.tsx
+│   └── auth/                            # AuthModal.tsx (Login & SSO dialog)
+│
+├── App.tsx                              # Thin Shell orchestrating Navbar & Tab Routing (~100 lines)
+└── main.tsx
+```
+
 ---
 
-## 3. Hybrid Authentication & RBAC Flow
+## 3. Frontend State Management 3 SSOT Rules
 
-```
-                                [Client Request]
-                                       │
-                ┌──────────────────────┴──────────────────────┐
-                ▼                                             ▼
-     [Human: Browser SSO / PW]                     [Machine: AI Agent / CI]
-     • Header: `Bearer <jwt_token>`                • Header: `Bearer ep_live_...`
-     • Validated via jsonwebtoken (HS256)          • Validated via SHA-256 Hash in `api_keys`
-                │                                             │
-                └──────────────────────┬──────────────────────┘
-                                       ▼
-                   [Axum Extractor: `AuthUser`]
-                   • Extracts: id, email, name, role (Admin | Operator | Viewer)
-                                       │
-                                       ▼ (For Admin-only endpoints)
-                   [Axum Extractor: `AdminUser`]
-                   • Enforces `user.role == Admin` ➔ Returns 403 FORBIDDEN if violated
-```
+To eliminate state duplication and race conditions, state is partitioned into 3 strict categories:
+
+1. **Server State (API Data)** ➔ **TanStack Query (`useQuery`, `useMutation`) Only**
+   * Never copy API query responses into local `useState` or `Zustand`. Let TanStack Query manage cache and revalidation.
+2. **Client Global State (Auth / Session)** ➔ **Zustand (`useAuthStore`) Only**
+   * Used strictly for cross-cutting client state: JWT token, active user profile, theme.
+3. **Form & Modal State (Input Validation)** ➔ **React Hook Form + Zod Only**
+   * Keep transient form errors and validation isolated inside the form component.
 
 ---
 
-## 4. 💡 10-Second Recipe: How to Add a New Business Feature
+## 4. 💡 10-Second Recipe: How to Add a New Fullstack Domain
 
-When adding a new domain entity (e.g., `employee` for HR management):
+When creating a new business feature (e.g. `employee`):
 
-### Step 1: Clone the reference vertical slice
+### 1. Backend Slice
 ```bash
 cp -r apps/api/src/modules/sample_record apps/api/src/modules/employee
+# Edit models.rs, handlers.rs, and mount in lib.rs / openapi.rs
 ```
 
-### Step 2: Define Schema in `apps/api/src/modules/employee/models.rs`
-```rust
-#[derive(Debug, Serialize, Deserialize, FromRow, ToSchema, Clone)]
-pub struct Employee {
-    pub id: String,
-    pub name: String,
-    pub department: String,
-    pub position: String,
-    pub salary: i64,
-    pub created_at: String,
-}
-```
-
-### Step 3: Implement Handlers in `apps/api/src/modules/employee/handlers.rs`
-Implement CRUD queries using SQLx and annotate with `#[utoipa::path(...)]`.
-
-### Step 4: Mount Router & Export in `apps/api/src/modules/mod.rs` & `apps/api/src/lib.rs`
-```rust
-// In apps/api/src/modules/mod.rs
-pub mod employee;
-pub mod sample_record;
-
-// In apps/api/src/lib.rs
-let employee_router = modules::employee::router().with_state(state.clone());
-```
-
-### Step 5: Sync Types & Verify
+### 2. Frontend Slice
 ```bash
-make codegen   # Regenerates packages/api-client/src/schema.d.ts in 30ms
-make test      # Runs in-memory DB tests + TS typecheck + Visual snapshots
+cp -r apps/web/src/features/sample_record apps/web/src/features/employee
+# Edit EmployeeGridView.tsx and mount in App.tsx
+```
+
+### 3. Sync & Test
+```bash
+make codegen && make test
 ```
 
 ---
