@@ -128,14 +128,28 @@ test.describe('Frontend Visual Regression Tests', () => {
     await page.goto('/')
   })
 
-  test('1. ERP Data Grid View Snapshot', async ({ page }) => {
+  test('1. Backoffice Admin Control Plane View Snapshot', async ({ page }) => {
+    // Login as admin first
+    await page.click('button:has-text("로그인 / SSO")')
+    await page.click('button:has-text("최고 관리자 (Admin)")')
+    await expect(page.locator('header span:has-text("최고 관리자")')).toBeVisible()
+
+    await expect(page.locator('text=전사 사용자 및 M2M API Key 총괄 관제')).toBeVisible()
+    await expect(page).toHaveScreenshot('backoffice-admin-view.png', {
+      maxDiffPixelRatio: 0.02,
+    })
+  })
+
+  test('2. ERP Data Grid View Snapshot', async ({ page }) => {
+    await page.click('button:has-text("ERP 수주 그리드")')
     await expect(page.locator('table')).toBeVisible()
     await expect(page).toHaveScreenshot('erp-data-grid.png', {
       maxDiffPixelRatio: 0.02,
     })
   })
 
-  test('2. New Order Zod Modal Snapshot', async ({ page }) => {
+  test('3. New Order Zod Modal Snapshot', async ({ page }) => {
+    await page.click('button:has-text("ERP 수주 그리드")')
     await page.click('button:has-text("+ 신규 수주 등록")')
     await expect(page.locator('h3:has-text("신규 수주 등록")')).toBeVisible()
     await expect(page).toHaveScreenshot('new-order-modal.png', {
@@ -143,32 +157,18 @@ test.describe('Frontend Visual Regression Tests', () => {
     })
   })
 
-  test('3. SaaS Dashboard View Snapshot', async ({ page }) => {
-    await page.click('button:has-text("2. SaaS 대시보드")')
+  test('4. SIEM Security Dashboard View Snapshot', async ({ page }) => {
+    await page.click('button:has-text("SIEM 보안 로그")')
     await expect(page.locator('text=SaaS 운영 및 실시간 SIEM 감사 로그')).toBeVisible()
     await expect(page).toHaveScreenshot('saas-dashboard.png', {
       maxDiffPixelRatio: 0.02,
     })
   })
 
-  test('4. Mobile Responsive Viewport Snapshot', async ({ page }) => {
+  test('5. Mobile Responsive Viewport Snapshot', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })
     await expect(page.locator('header')).toBeVisible()
     await expect(page).toHaveScreenshot('mobile-viewport.png', {
-      maxDiffPixelRatio: 0.02,
-    })
-  })
-
-  test('5. Backoffice Admin Control Plane View Snapshot', async ({ page }) => {
-    // Login as admin first
-    await page.click('button:has-text("로그인 / SSO")')
-    await page.click('button:has-text("최고 관리자(Admin) 원클릭 로그인")')
-    await expect(page.locator('header span:has-text("최고 관리자")')).toBeVisible()
-
-    // Switch to Backoffice Tab
-    await page.click('button:has-text("5. 백오피스")')
-    await expect(page.locator('text=전사 사용자 권한 & M2M API Key 총괄 관리')).toBeVisible()
-    await expect(page).toHaveScreenshot('backoffice-admin-view.png', {
       maxDiffPixelRatio: 0.02,
     })
   })
