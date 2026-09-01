@@ -9,6 +9,12 @@ use utoipa::ToSchema;
 
 #[derive(Error, Debug)]
 pub enum AppError {
+    #[error("Unauthorized: {0}")]
+    Unauthorized(String),
+
+    #[error("Forbidden: {0}")]
+    Forbidden(String),
+
     #[error("Database error: {0}")]
     Database(#[from] sqlx::Error),
 
@@ -31,6 +37,8 @@ pub struct ErrorResponse {
 impl AppError {
     pub fn status_and_code(&self) -> (StatusCode, &'static str, String) {
         match self {
+            AppError::Unauthorized(msg) => (StatusCode::UNAUTHORIZED, "UNAUTHORIZED", msg.clone()),
+            AppError::Forbidden(msg) => (StatusCode::FORBIDDEN, "FORBIDDEN", msg.clone()),
             AppError::NotFound(msg) => (StatusCode::NOT_FOUND, "NOT_FOUND", msg.clone()),
             AppError::BadRequest(msg) => (StatusCode::BAD_REQUEST, "BAD_REQUEST", msg.clone()),
             AppError::Database(err) => {

@@ -1,22 +1,11 @@
-mod db;
-mod error;
-mod handlers;
-mod models;
-mod openapi;
-
-use axum::{routing::get, Router};
+use api::{create_app_router, db, handlers::AppState, openapi::ApiDoc};
 use clap::Parser;
-use handlers::AppState;
-use openapi::ApiDoc;
 use std::net::SocketAddr;
 use std::sync::atomic::AtomicU64;
 use std::sync::Arc;
 use tokio::signal;
-use tower_http::cors::{Any, CorsLayer};
-use tower_http::trace::TraceLayer;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use utoipa::OpenApi;
-use utoipa_swagger_ui::SwaggerUi;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Enterprise Agent-Native Backend Service")]
@@ -34,34 +23,6 @@ pub struct Cli {
 
     #[arg(long, default_value_t = false)]
     pub export_openapi: bool,
-}
-
-pub fn create_router(state: Arc<AppState>) -> Router {
-    let cors = CorsLayer::new()
-        .allow_origin(Any)
-        .allow_methods(Any)
-        .allow_headers(Any);
-
-    let api_router = Router::new()
-        .route("/api/health", get(handlers::get_health))
-        .route(
-            "/api/orders",
-            get(handlers::list_orders).post(handlers::create_order),
-        )
-        .route(
-            "/api/orders/{id}",
-            get(handlers::get_order)
-                .put(handlers::update_order)
-                .delete(handlers::delete_order),
-        )
-        .route("/api/audit-logs", get(handlers::list_audit_logs))
-        .with_state(state);
-
-    Router::new()
-        .merge(api_router)
-        .merge(SwaggerUi::new("/swagger-ui").url("/api/openapi.json", ApiDoc::openapi()))
-        .layer(cors)
-        .layer(TraceLayer::new_for_http())
 }
 
 #[tokio::main]
@@ -93,7 +54,7 @@ async fn main() -> anyhow::Result<()> {
         request_count: AtomicU64::new(0),
     });
 
-    let app = create_router(state);
+    let app = create_app_router(state);
     let addr = SocketAddr::from(([0, 0, 0, 0], cli.port));
     tracing::info!("🦀 Axum 0.8 Enterprise API listening on http://{}", addr);
     tracing::info!("📖 Swagger UI available at http://{}/swagger-ui", addr);
