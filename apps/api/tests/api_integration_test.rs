@@ -153,3 +153,40 @@ proptest! {
         })?;
     }
 }
+
+#[tokio::test]
+async fn test_sqlite_wal_concurrent_writes() {
+    let app = setup_test_app().await;
+    let mut handles = Vec::new();
+
+    for i in 0..30 {
+        let app_clone = app.clone();
+        let handle = tokio::spawn(async move {
+            let payload = serde_json::json!({
+                "client": format!("동시성 고객사 #{}", i),
+                "items": "동시 수주 스트레스 테스트",
+                "amount": 1000000 + (i * 10000) as i64,
+                "priority": "보통"
+            });
+
+            let res = app_clone
+                .oneshot(
+                    Request::builder()
+                        .method("POST")
+                        .uri("/api/orders")
+                        .header("Content-Type", "application/json")
+                        .body(Body::from(serde_json::to_vec(&payload).unwrap()))
+                        .unwrap(),
+                )
+                .await
+                .unwrap();
+
+            assert_eq!(res.status(), StatusCode::CREATED);
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.await.unwrap();
+    }
+}

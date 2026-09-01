@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test:unit": "vitest run",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
     "typecheck": "tsc --noEmit"
@@ -34,6 +35,7 @@
     "@vitejs/plugin-react": "^6.1.1",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.3",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
   }
 }
