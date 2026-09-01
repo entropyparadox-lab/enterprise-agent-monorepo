@@ -24,7 +24,12 @@ pub struct Cli {
     #[arg(short, long, env = "PORT", default_value = "8080")]
     pub port: u16,
 
-    #[arg(short, long, env = "DATABASE_URL", default_value = "sqlite://enterprise.db")]
+    #[arg(
+        short,
+        long,
+        env = "DATABASE_URL",
+        default_value = "sqlite://enterprise.db"
+    )]
     pub db_url: String,
 
     #[arg(long, default_value_t = false)]
@@ -39,7 +44,10 @@ pub fn create_router(state: Arc<AppState>) -> Router {
 
     let api_router = Router::new()
         .route("/api/health", get(handlers::get_health))
-        .route("/api/orders", get(handlers::list_orders).post(handlers::create_order))
+        .route(
+            "/api/orders",
+            get(handlers::list_orders).post(handlers::create_order),
+        )
         .route(
             "/api/orders/{id}",
             get(handlers::get_order)

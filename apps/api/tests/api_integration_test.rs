@@ -92,7 +92,12 @@ async fn test_list_orders_and_create_order() {
         .unwrap();
 
     assert_eq!(create_response.status(), StatusCode::CREATED);
-    let body = create_response.into_body().collect().await.unwrap().to_bytes();
+    let body = create_response
+        .into_body()
+        .collect()
+        .await
+        .unwrap()
+        .to_bytes();
     let created: Order = serde_json::from_slice(&body).unwrap();
     assert_eq!(created.client, "테스트 기업");
     assert_eq!(created.amount, 5500000);

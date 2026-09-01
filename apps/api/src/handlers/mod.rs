@@ -33,7 +33,9 @@ pub struct OrderQueryParams {
         (status = 200, description = "System health status", body = HealthResponse)
     )
 )]
-pub async fn get_health(State(state): State<Arc<AppState>>) -> Result<Json<HealthResponse>, AppError> {
+pub async fn get_health(
+    State(state): State<Arc<AppState>>,
+) -> Result<Json<HealthResponse>, AppError> {
     state.request_count.fetch_add(1, Ordering::Relaxed);
     let uptime = state.start_time.elapsed().as_secs();
 
@@ -44,7 +46,11 @@ pub async fn get_health(State(state): State<Arc<AppState>>) -> Result<Json<Healt
         status: "HEALTHY".to_string(),
         version: env!("CARGO_PKG_VERSION").to_string(),
         uptime_seconds: uptime,
-        database: if db_ok { "CONNECTED_SQLITE_WAL".to_string() } else { "DISCONNECTED".to_string() },
+        database: if db_ok {
+            "CONNECTED_SQLITE_WAL".to_string()
+        } else {
+            "DISCONNECTED".to_string()
+        },
     }))
 }
 
@@ -186,10 +192,14 @@ pub async fn create_order(
     Json(payload): Json<CreateOrderRequest>,
 ) -> Result<(StatusCode, Json<Order>), AppError> {
     if payload.client.trim().is_empty() {
-        return Err(AppError::BadRequest("Client name cannot be empty".to_string()));
+        return Err(AppError::BadRequest(
+            "Client name cannot be empty".to_string(),
+        ));
     }
     if payload.amount <= 0 {
-        return Err(AppError::BadRequest("Amount must be greater than 0".to_string()));
+        return Err(AppError::BadRequest(
+            "Amount must be greater than 0".to_string(),
+        ));
     }
 
     let id = format!("ORD-2026-{:04}", rand_number());
