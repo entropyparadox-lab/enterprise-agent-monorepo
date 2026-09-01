@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider, useQuery, useMutation } from '@tansta
 import { Toaster, toast } from 'sonner'
 import { api } from './lib/api'
 import { useAuthStore } from './lib/authStore'
+import { StateBoundary } from './components/StateBoundary'
 import type { Order, CreateOrderRequest, UpdateOrderRequest } from '@repo/api-client'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -338,8 +339,8 @@ function DashboardShell() {
             {/* Header & Primary Action */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="text-xs font-mono font-semibold tracking-wider text-cyan-400 uppercase mb-1">
-                  Enterprise Control Plane & RBAC
+                <div className="text-[11px] font-mono font-medium tracking-wider text-cyan-400 uppercase mb-1">
+                  Enterprise Control Plane // RBAC &amp; M2M Keys
                 </div>
                 <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
                   전사 사용자 및 M2M API Key 총괄 관제
@@ -352,18 +353,17 @@ function DashboardShell() {
               {user?.role === 'Admin' && (
                 <button
                   onClick={() => setIsApiKeyModalOpen(true)}
-                  className="px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-purple-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all"
+                  className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold rounded-lg shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                 >
-                  <span>🔑</span>
-                  <span>신규 M2M API Key 발급</span>
+                  <span>+ 신규 M2M API Key 발급</span>
                 </button>
               )}
             </div>
 
             {/* Non-Admin Warning Guard */}
             {user?.role !== 'Admin' && (
-              <div className="p-8 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-slate-800 text-center space-y-4 shadow-2xl">
-                <div className="w-12 h-12 rounded-2xl bg-purple-950/60 border border-purple-800/80 text-purple-400 text-2xl flex items-center justify-center mx-auto">
+              <div className="p-8 rounded-xl bg-slate-900/60 border border-slate-800 text-center space-y-4 shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-2xl flex items-center justify-center mx-auto">
                   🔒
                 </div>
                 <div className="space-y-1">
@@ -374,7 +374,7 @@ function DashboardShell() {
                 </div>
                 <button
                   onClick={() => handleQuickLogin('admin@enterprise.local')}
-                  className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-purple-600/30 cursor-pointer"
+                  className="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold rounded-lg shadow-sm cursor-pointer transition-colors"
                 >
                   최고 관리자(Admin) 계정으로 전환
                 </button>
@@ -384,41 +384,41 @@ function DashboardShell() {
             {/* Admin Dashboard */}
             {user?.role === 'Admin' && (
               <div className="space-y-8">
-                {/* Metric Summary Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 shadow-lg space-y-2">
-                    <div className="text-xs font-mono text-slate-400">TOTAL ENTERPRISE USERS</div>
-                    <div className="text-2xl font-black text-white font-mono">{usersList.length}명</div>
-                    <div className="text-[11px] text-emerald-400 flex items-center gap-1 font-medium">
-                      <span>●</span> 전사 계정 활성 동기화됨
+                {/* Metric Summary Data Strip (Zero Data Slop, Clean Layout Rhythm) */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-800/80 rounded-xl overflow-hidden border border-slate-800 shadow-sm">
+                  <div className="bg-[#0B0F19] p-4.5 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Total Accounts</div>
+                    <div className="text-xl font-bold text-white font-mono tracking-tight">{usersList.length}명</div>
+                    <div className="text-[11px] text-emerald-400 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" /> 계정 활성 동기화됨
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 shadow-lg space-y-2">
-                    <div className="text-xs font-mono text-slate-400">ACTIVE M2M API KEYS</div>
-                    <div className="text-2xl font-black text-purple-400 font-mono">
+                  <div className="bg-[#0B0F19] p-4.5 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Active M2M Keys</div>
+                    <div className="text-xl font-bold text-cyan-400 font-mono tracking-tight">
                       {apiKeysList.filter((k) => k.is_active).length}개
                     </div>
-                    <div className="text-[11px] text-purple-400 flex items-center gap-1 font-medium">
-                      <span>●</span> SHA-256 일방향 해시 암호화
+                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" /> SHA-256 일방향 암호화
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 shadow-lg space-y-2">
-                    <div className="text-xs font-mono text-slate-400">TOTAL REVENUE (ORDERS)</div>
-                    <div className="text-2xl font-black text-cyan-400 font-mono">
+                  <div className="bg-[#0B0F19] p-4.5 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Order Volume</div>
+                    <div className="text-xl font-bold text-white font-mono tracking-tight">
                       {(ordersList.reduce((acc, o) => acc + o.amount, 0) / 10000).toLocaleString()}만원
                     </div>
-                    <div className="text-[11px] text-cyan-400 flex items-center gap-1 font-medium">
-                      <span>●</span> {ordersList.length}건 누적 수주
+                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 inline-block" /> {ordersList.length}건 누적 수주
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 shadow-lg space-y-2">
-                    <div className="text-xs font-mono text-slate-400">SECURITY AUDIT STATUS</div>
-                    <div className="text-2xl font-black text-emerald-400 font-mono">HEALTHY</div>
-                    <div className="text-[11px] text-slate-400 flex items-center gap-1 font-medium">
-                      <span>●</span> 0 Auth Failures Detected
+                  <div className="bg-[#0B0F19] p-4.5 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Database State</div>
+                    <div className="text-xl font-bold text-emerald-400 font-mono tracking-tight">ONLINE</div>
+                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" /> SQLite WAL Mode
                     </div>
                   </div>
                 </div>
@@ -426,124 +426,148 @@ function DashboardShell() {
                 {/* Section 1: User & RBAC Grid */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-bold text-slate-200 tracking-wide font-mono flex items-center gap-2">
+                    <h2 className="text-xs font-bold text-slate-200 tracking-wider uppercase font-mono flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-cyan-400" />
                       1. 전사 사용자 및 RBAC 역할 관리 (User Directory)
                     </h2>
                     <span className="text-xs text-slate-500 font-mono">{usersList.length} Accounts</span>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-md overflow-hidden shadow-xl">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-900/90 text-slate-400 font-mono uppercase tracking-wider border-b border-slate-800">
-                          <tr>
-                            <th className="p-4">사번/ID</th>
-                            <th className="p-4">성명</th>
-                            <th className="p-4">이메일 계정</th>
-                            <th className="p-4">인증 수단</th>
-                            <th className="p-4 text-center">할당된 역할 (RBAC)</th>
-                            <th className="p-4 text-right">가입 일시</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800/60">
-                          {usersList.map((u) => (
-                            <tr key={u.id} className="hover:bg-slate-800/30 transition-colors">
-                              <td className="p-4 font-mono font-bold text-cyan-400">{u.id}</td>
-                              <td className="p-4 font-bold text-white">{u.name}</td>
-                              <td className="p-4 text-slate-300 font-mono">{u.email}</td>
-                              <td className="p-4">
-                                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
-                                  {u.auth_type}
-                                </span>
-                              </td>
-                              <td className="p-4 text-center">
-                                <select
-                                  value={u.role}
-                                  onChange={(e) => updateRoleMutation.mutate({ userId: u.id, role: e.target.value })}
-                                  className="px-3 py-1.5 bg-slate-950 border border-slate-700 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 cursor-pointer font-medium"
-                                >
-                                  <option value="Admin">Admin (최고 관리자)</option>
-                                  <option value="Operator">Operator (운영자)</option>
-                                  <option value="Viewer">Viewer (조회자)</option>
-                                </select>
-                              </td>
-                              <td className="p-4 text-right text-slate-500 font-mono">{u.created_at}</td>
+                  <StateBoundary
+                    isLoading={adminUsersQuery.isLoading}
+                    error={adminUsersQuery.error}
+                    data={usersList}
+                    onRetry={() => adminUsersQuery.refetch()}
+                    emptyMessage="등록된 전사 사용자가 없습니다."
+                  >
+                    <div className="rounded-xl border border-slate-800 bg-slate-900/30 overflow-hidden shadow-sm">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-900/90 text-slate-400 font-mono uppercase tracking-wider border-b border-slate-800">
+                            <tr>
+                              <th className="p-3.5">사번/ID</th>
+                              <th className="p-3.5">성명</th>
+                              <th className="p-3.5">이메일 계정</th>
+                              <th className="p-3.5">인증 수단</th>
+                              <th className="p-3.5 text-center">할당된 역할 (RBAC)</th>
+                              <th className="p-3.5 text-right">가입 일시</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/60">
+                            {usersList.map((u) => (
+                              <tr key={u.id} className="hover:bg-slate-800/20 transition-colors">
+                                <td className="p-3.5 font-mono font-bold text-cyan-400">{u.id}</td>
+                                <td className="p-3.5 font-bold text-white">{u.name}</td>
+                                <td className="p-3.5 text-slate-300 font-mono">{u.email}</td>
+                                <td className="p-3.5">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                                    {u.auth_type}
+                                  </span>
+                                </td>
+                                <td className="p-3.5 text-center">
+                                  <select
+                                    value={u.role}
+                                    onChange={(e) => updateRoleMutation.mutate({ userId: u.id, role: e.target.value })}
+                                    className="px-2.5 py-1 bg-slate-950 border border-slate-700 rounded text-xs text-white focus:outline-none focus:border-cyan-400 cursor-pointer font-medium"
+                                  >
+                                    <option value="Admin">Admin (최고 관리자)</option>
+                                    <option value="Operator">Operator (운영자)</option>
+                                    <option value="Viewer">Viewer (조회자)</option>
+                                  </select>
+                                </td>
+                                <td className="p-3.5 text-right text-slate-500 font-mono">{u.created_at}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
+                  </StateBoundary>
                 </div>
 
                 {/* Section 2: M2M API Keys Grid */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-bold text-slate-200 tracking-wide font-mono flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-purple-400" />
-                      2. M2M AI 에이전트 & CI Scoped API Keys
+                    <h2 className="text-xs font-bold text-slate-200 tracking-wider uppercase font-mono flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                      2. M2M AI 에이전트 &amp; CI Scoped API Keys
                     </h2>
                     <span className="text-xs text-slate-500 font-mono">{apiKeysList.length} Keys Registered</span>
                   </div>
 
-                  <div className="rounded-2xl border border-slate-800/80 bg-slate-900/40 backdrop-blur-md overflow-hidden shadow-xl">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-left text-xs">
-                        <thead className="bg-slate-900/90 text-slate-400 font-mono uppercase tracking-wider border-b border-slate-800">
-                          <tr>
-                            <th className="p-4">Key ID</th>
-                            <th className="p-4">에이전트 / CI 서비스명</th>
-                            <th className="p-4">Key Prefix</th>
-                            <th className="p-4 text-center">접근 권한</th>
-                            <th className="p-4 text-center">상태</th>
-                            <th className="p-4 text-right">발급 일시</th>
-                            <th className="p-4 text-center">관리</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800/60">
-                          {apiKeysList.map((k) => (
-                            <tr key={k.id} className="hover:bg-slate-800/30 transition-colors">
-                              <td className="p-4 font-mono font-bold text-purple-400">{k.id}</td>
-                              <td className="p-4 font-bold text-white">{k.name}</td>
-                              <td className="p-4 font-mono text-slate-300">
-                                <span className="bg-slate-950 px-2 py-1 rounded border border-slate-800">
-                                  {k.key_prefix}...
-                                </span>
-                              </td>
-                              <td className="p-4 text-center">
-                                <span className="px-2.5 py-0.5 rounded text-[10px] font-bold bg-purple-950 text-purple-300 border border-purple-800">
-                                  {k.role}
-                                </span>
-                              </td>
-                              <td className="p-4 text-center">
-                                <span
-                                  className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
-                                    k.is_active
-                                      ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                                      : 'bg-rose-950 text-rose-400 border border-rose-800'
-                                  }`}
-                                >
-                                  {k.is_active ? 'ACTIVE' : 'REVOKED'}
-                                </span>
-                              </td>
-                              <td className="p-4 text-right text-slate-500 font-mono">{k.created_at}</td>
-                              <td className="p-4 text-center">
-                                {k.is_active && (
-                                  <button
-                                    onClick={() => revokeApiKeyMutation.mutate(k.id)}
-                                    className="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 rounded-lg text-[11px] font-medium transition-colors cursor-pointer"
-                                  >
-                                    비활성화
-                                  </button>
-                                )}
-                              </td>
+                  <StateBoundary
+                    isLoading={apiKeysQuery.isLoading}
+                    error={apiKeysQuery.error}
+                    data={apiKeysList}
+                    onRetry={() => apiKeysQuery.refetch()}
+                    emptyMessage="발급된 M2M API Key가 없습니다."
+                    emptyAction={
+                      <button
+                        onClick={() => setIsApiKeyModalOpen(true)}
+                        className="px-3.5 py-1.5 bg-cyan-500 text-slate-950 rounded-lg text-xs font-bold"
+                      >
+                        + 첫 API Key 발급하기
+                      </button>
+                    }
+                  >
+                    <div className="rounded-xl border border-slate-800 bg-slate-900/30 overflow-hidden shadow-sm">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs">
+                          <thead className="bg-slate-900/90 text-slate-400 font-mono uppercase tracking-wider border-b border-slate-800">
+                            <tr>
+                              <th className="p-3.5">Key ID</th>
+                              <th className="p-3.5">에이전트 / CI 서비스명</th>
+                              <th className="p-3.5">Key Prefix</th>
+                              <th className="p-3.5 text-center">접근 권한</th>
+                              <th className="p-3.5 text-center">상태</th>
+                              <th className="p-3.5 text-right">발급 일시</th>
+                              <th className="p-3.5 text-center">관리</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/60">
+                            {apiKeysList.map((k) => (
+                              <tr key={k.id} className="hover:bg-slate-800/20 transition-colors">
+                                <td className="p-3.5 font-mono font-bold text-cyan-400">{k.id}</td>
+                                <td className="p-3.5 font-bold text-white">{k.name}</td>
+                                <td className="p-3.5 font-mono text-slate-300">
+                                  <span className="bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-[11px]">
+                                    {k.key_prefix}...
+                                  </span>
+                                </td>
+                                <td className="p-3.5 text-center">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                                    {k.role}
+                                  </span>
+                                </td>
+                                <td className="p-3.5 text-center">
+                                  <span
+                                    className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
+                                      k.is_active
+                                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                                        : 'bg-rose-950 text-rose-400 border border-rose-800'
+                                    }`}
+                                  >
+                                    {k.is_active ? 'ACTIVE' : 'REVOKED'}
+                                  </span>
+                                </td>
+                                <td className="p-3.5 text-right text-slate-500 font-mono">{k.created_at}</td>
+                                <td className="p-3.5 text-center">
+                                  {k.is_active && (
+                                    <button
+                                      onClick={() => revokeApiKeyMutation.mutate(k.id)}
+                                      className="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 rounded text-[11px] font-medium transition-colors cursor-pointer"
+                                    >
+                                      비활성화
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                  </div>
+                  </StateBoundary>
                 </div>
               </div>
             )}
