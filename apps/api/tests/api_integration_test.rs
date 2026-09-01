@@ -9,12 +9,12 @@ use axum::{
     http::{Request, StatusCode},
 };
 use http_body_util::BodyExt;
+use proptest::prelude::*;
 use std::sync::atomic::AtomicU64;
 use std::sync::Arc;
 use tower::ServiceExt;
 
 async fn setup_test_app() -> axum::Router {
-    // In-memory SQLite with WAL for isolated parallel test execution
     let pool = init_db_pool("sqlite::memory:")
         .await
         .expect("Failed to initialize test DB pool");
@@ -53,7 +53,6 @@ async fn test_health_check() {
 async fn test_list_orders_and_create_order() {
     let app = setup_test_app().await;
 
-    // 1. Initial list orders (seeded data)
     let response = app
         .clone()
         .oneshot(
@@ -70,7 +69,6 @@ async fn test_list_orders_and_create_order() {
     let orders: Vec<Order> = serde_json::from_slice(&body).unwrap();
     assert!(!orders.is_empty(), "Initial seeded orders should exist");
 
-    // 2. Create a new order
     let new_order_json = serde_json::json!({
         "client": "테스트 기업",
         "items": "통합 검증 스위트 1EA",
@@ -118,4 +116,40 @@ async fn test_order_not_found_returns_404() {
         .unwrap();
 
     assert_eq!(response.status(), StatusCode::NOT_FOUND);
+}
+
+// 🛡️ Invariant Property-Based Testing
+proptest! {
+    #[test]
+    fn test_order_validation_invariants(
+        client in "[a-zA-Z가-힣0-9 ]{0,30}",
+        amount in -1000i64..10_000_000i64
+    ) {
+        let is_valid = !client.trim().is_empty() && amount > 0;
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        rt.block_on(async {
+            let app = setup_test_app().await;
+            let payload = serde_json::json!({
+                "client": client,
+                "items": "Invariant test item",
+                "amount": amount,
+            });
+
+            let res = app.oneshot(
+                Request::builder()
+                    .method("POST")
+                    .uri("/api/orders")
+                    .header("Content-Type", "application/json")
+                    .body(Body::from(serde_json::to_vec(&payload).unwrap()))
+                    .unwrap()
+            ).await.unwrap();
+
+            if is_valid {
+                prop_assert_eq!(res.status(), StatusCode::CREATED);
+            } else {
+                prop_assert_eq!(res.status(), StatusCode::BAD_REQUEST);
+            }
+            Ok(())
+        })?;
+    }
 }
