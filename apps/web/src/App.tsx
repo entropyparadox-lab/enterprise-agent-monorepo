@@ -31,7 +31,7 @@ export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <DashboardShell />
-      <Toaster position="bottom-right" richColors theme="dark" />
+      <Toaster position="bottom-right" richColors theme="light" />
     </QueryClientProvider>
   )
 }
@@ -208,10 +208,10 @@ function DashboardShell() {
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<OrderFormValues>({
+  } = useForm<OrderFormValues>(({
     resolver: zodResolver(orderSchema),
     defaultValues: { priority: '보통', amount: 1000000 },
-  })
+  }) as any)
 
   const onSubmitNewOrder = (data: OrderFormValues) => {
     createMutation.mutate({
@@ -236,19 +236,19 @@ function DashboardShell() {
   const apiKeysList = apiKeysQuery.data || []
 
   return (
-    <div className="min-h-screen bg-[#090D16] text-slate-100 flex flex-col font-sans antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-sans antialiased selection:bg-cyan-100 selection:text-cyan-900">
       {/* Top Navbar */}
-      <header className="h-16 border-b border-slate-800/80 bg-[#0B0F19]/80 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-40">
+      <header className="h-16 border-b border-slate-200 bg-white/95 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-40 shadow-xs">
         <div className="flex items-center gap-6">
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-slate-950 font-black text-sm shadow-lg shadow-cyan-500/20">
+            <div className="w-8 h-8 rounded-lg bg-cyan-600 flex items-center justify-center text-white font-black text-sm shadow-xs">
               🦀
             </div>
             <div>
-              <div className="font-bold text-sm text-slate-100 tracking-tight flex items-center gap-2">
+              <div className="font-bold text-sm text-slate-900 tracking-tight flex items-center gap-2">
                 <span>Enterprise Agent Platform</span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-cyan-950/80 text-cyan-400 border border-cyan-800/60">
+                <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-cyan-50 text-cyan-700 border border-cyan-200 font-semibold">
                   v1.0
                 </span>
               </div>
@@ -256,7 +256,7 @@ function DashboardShell() {
           </div>
 
           {/* Tab Navigation */}
-          <nav className="hidden md:flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-slate-800/80">
+          <nav className="hidden md:flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/80">
             {[
               { id: 'admin', label: '백오피스 관제' },
               { id: 'erp', label: 'ERP 수주 그리드' },
@@ -267,10 +267,10 @@ function DashboardShell() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs transition-all cursor-pointer ${
                   activeTab === tab.id
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 shadow-md shadow-cyan-500/25 font-bold'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    ? 'bg-white text-slate-950 shadow-xs font-bold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 font-medium'
                 }`}
               >
                 {tab.label}
@@ -282,38 +282,38 @@ function DashboardShell() {
         {/* Right Session Status */}
         <div className="flex items-center gap-3">
           {/* Telemetry Badge */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/60 border border-slate-800 text-[11px] font-mono">
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100/80 border border-slate-200 text-[11px] font-mono">
             <span
               className={`w-2 h-2 rounded-full ${
-                healthQuery.data?.status === 'HEALTHY' ? 'bg-emerald-400 shadow-sm shadow-emerald-400/50 animate-pulse' : 'bg-rose-400'
+                healthQuery.data?.status === 'HEALTHY' ? 'bg-emerald-500 shadow-xs animate-pulse' : 'bg-rose-500'
               }`}
             />
-            <span className="text-slate-400 font-medium">
-              SQLite WAL <span className="text-emerald-400 font-bold">ONLINE</span>
+            <span className="text-slate-600 font-medium">
+              SQLite WAL <span className="text-emerald-700 font-bold">ONLINE</span>
             </span>
           </div>
 
           {/* User Profile */}
           {isAuthenticated && user ? (
-            <div className="flex items-center gap-2.5 pl-3 border-l border-slate-800">
+            <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
               <div className="flex flex-col text-right">
-                <span className="text-xs font-bold text-slate-200">{user.name}</span>
-                <span className="text-[10px] text-slate-400 font-mono">{user.email}</span>
+                <span className="text-xs font-bold text-slate-900">{user.name}</span>
+                <span className="text-[10px] text-slate-500 font-mono">{user.email}</span>
               </div>
               <span
                 className={`px-2 py-0.5 rounded-md text-[10px] font-bold font-mono tracking-wide ${
                   user.role === 'Admin'
-                    ? 'bg-purple-950/80 text-purple-300 border border-purple-800/60'
+                    ? 'bg-slate-900 text-white'
                     : user.role === 'Operator'
-                    ? 'bg-blue-950/80 text-blue-300 border border-blue-800/60'
-                    : 'bg-slate-800 text-slate-400'
+                    ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                    : 'bg-slate-100 text-slate-700 border border-slate-200'
                 }`}
               >
                 {user.role}
               </span>
               <button
                 onClick={logout}
-                className="px-2.5 py-1 text-xs text-slate-400 hover:text-rose-400 hover:bg-rose-950/20 rounded-lg transition-colors cursor-pointer"
+                className="px-2.5 py-1 text-xs text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
               >
                 로그아웃
               </button>
@@ -321,7 +321,7 @@ function DashboardShell() {
           ) : (
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="px-4 py-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-slate-950 text-xs font-bold rounded-xl shadow-lg shadow-cyan-500/20 cursor-pointer transition-all"
+              className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-lg shadow-xs cursor-pointer transition-all"
             >
               로그인 / SSO
             </button>
@@ -339,13 +339,13 @@ function DashboardShell() {
             {/* Header & Primary Action */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="text-[11px] font-mono font-medium tracking-wider text-cyan-400 uppercase mb-1">
+                <div className="text-[11px] font-mono font-bold tracking-wider text-cyan-700 uppercase mb-1">
                   Enterprise Control Plane // RBAC &amp; M2M Keys
                 </div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
                   전사 사용자 및 M2M API Key 총괄 관제
                 </h1>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-500 mt-1">
                   사내 구성원 권한(Role) 할당 및 AI 에이전트/CI 자동화 파이프라인 인증키 생명주기를 관리합니다.
                 </p>
               </div>
@@ -353,7 +353,7 @@ function DashboardShell() {
               {user?.role === 'Admin' && (
                 <button
                   onClick={() => setIsApiKeyModalOpen(true)}
-                  className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold rounded-lg shadow-sm flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-lg shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
                 >
                   <span>+ 신규 M2M API Key 발급</span>
                 </button>
@@ -362,19 +362,19 @@ function DashboardShell() {
 
             {/* Non-Admin Warning Guard */}
             {user?.role !== 'Admin' && (
-              <div className="p-8 rounded-xl bg-slate-900/60 border border-slate-800 text-center space-y-4 shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-2xl flex items-center justify-center mx-auto">
+              <div className="p-8 rounded-xl bg-white border border-slate-200 text-center space-y-4 shadow-xs">
+                <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-2xl flex items-center justify-center mx-auto">
                   🔒
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-base font-bold text-white">최고 관리자(Admin) 권한이 필요합니다</h3>
-                  <p className="text-xs text-slate-400 max-w-md mx-auto">
+                  <h3 className="text-base font-bold text-slate-900">최고 관리자(Admin) 권한이 필요합니다</h3>
+                  <p className="text-xs text-slate-500 max-w-md mx-auto">
                     현재 로그인 계정({user?.email || '게스트'})은 백오피스 관제 권한이 없습니다. 아래 버튼으로 데모 관리자 계정에 즉시 접속할 수 있습니다.
                   </p>
                 </div>
                 <button
                   onClick={() => handleQuickLogin('admin@enterprise.local')}
-                  className="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-bold rounded-lg shadow-sm cursor-pointer transition-colors"
+                  className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-lg shadow-xs cursor-pointer transition-colors"
                 >
                   최고 관리자(Admin) 계정으로 전환
                 </button>
@@ -385,40 +385,40 @@ function DashboardShell() {
             {user?.role === 'Admin' && (
               <div className="space-y-8">
                 {/* Metric Summary Data Strip (Zero Data Slop, Clean Layout Rhythm) */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-800/80 rounded-xl overflow-hidden border border-slate-800 shadow-sm">
-                  <div className="bg-[#0B0F19] p-4.5 space-y-1">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Total Accounts</div>
-                    <div className="text-xl font-bold text-white font-mono tracking-tight">{usersList.length}명</div>
-                    <div className="text-[11px] text-emerald-400 flex items-center gap-1.5 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block" /> 계정 활성 동기화됨
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-slate-200 rounded-xl overflow-hidden border border-slate-200 shadow-xs">
+                  <div className="bg-white p-5 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-semibold">Total Accounts</div>
+                    <div className="text-2xl font-black text-slate-900 font-mono tracking-tight">{usersList.length}명</div>
+                    <div className="text-[11px] text-emerald-700 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block" /> 계정 활성 동기화됨
                     </div>
                   </div>
 
-                  <div className="bg-[#0B0F19] p-4.5 space-y-1">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Active M2M Keys</div>
-                    <div className="text-xl font-bold text-cyan-400 font-mono tracking-tight">
+                  <div className="bg-white p-5 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-semibold">Active M2M Keys</div>
+                    <div className="text-2xl font-black text-cyan-700 font-mono tracking-tight">
                       {apiKeysList.filter((k) => k.is_active).length}개
                     </div>
-                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 inline-block" /> SHA-256 일방향 암호화
+                    <div className="text-[11px] text-slate-600 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-600 inline-block" /> SHA-256 일방향 암호화
                     </div>
                   </div>
 
-                  <div className="bg-[#0B0F19] p-4.5 space-y-1">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Order Volume</div>
-                    <div className="text-xl font-bold text-white font-mono tracking-tight">
+                  <div className="bg-white p-5 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-semibold">Order Volume</div>
+                    <div className="text-2xl font-black text-slate-900 font-mono tracking-tight">
                       {(ordersList.reduce((acc, o) => acc + o.amount, 0) / 10000).toLocaleString()}만원
                     </div>
-                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-slate-500 inline-block" /> {ordersList.length}건 누적 수주
+                    <div className="text-[11px] text-slate-600 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-400 inline-block" /> {ordersList.length}건 누적 수주
                     </div>
                   </div>
 
-                  <div className="bg-[#0B0F19] p-4.5 space-y-1">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">Database State</div>
-                    <div className="text-xl font-bold text-emerald-400 font-mono tracking-tight">ONLINE</div>
-                    <div className="text-[11px] text-slate-400 flex items-center gap-1.5 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse inline-block" /> SQLite WAL Mode
+                  <div className="bg-white p-5 space-y-1">
+                    <div className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-semibold">Database State</div>
+                    <div className="text-2xl font-black text-emerald-700 font-mono tracking-tight">ONLINE</div>
+                    <div className="text-[11px] text-slate-600 flex items-center gap-1.5 font-medium">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse inline-block" /> SQLite WAL Mode
                     </div>
                   </div>
                 </div>
@@ -426,11 +426,11 @@ function DashboardShell() {
                 {/* Section 1: User & RBAC Grid */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-xs font-bold text-slate-200 tracking-wider uppercase font-mono flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                    <h2 className="text-xs font-bold text-slate-800 tracking-wider uppercase font-mono flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-cyan-600" />
                       1. 전사 사용자 및 RBAC 역할 관리 (User Directory)
                     </h2>
-                    <span className="text-xs text-slate-500 font-mono">{usersList.length} Accounts</span>
+                    <span className="text-xs text-slate-500 font-mono font-medium">{usersList.length} Accounts</span>
                   </div>
 
                   <StateBoundary
@@ -440,10 +440,10 @@ function DashboardShell() {
                     onRetry={() => adminUsersQuery.refetch()}
                     emptyMessage="등록된 전사 사용자가 없습니다."
                   >
-                    <div className="rounded-xl border border-slate-800 bg-slate-900/30 overflow-hidden shadow-sm">
+                    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
                       <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs">
-                          <thead className="bg-slate-900/90 text-slate-400 font-mono uppercase tracking-wider border-b border-slate-800">
+                          <thead className="bg-slate-50/90 text-slate-600 font-mono uppercase tracking-wider border-b border-slate-200 font-semibold">
                             <tr>
                               <th className="p-3.5">사번/ID</th>
                               <th className="p-3.5">성명</th>
@@ -453,14 +453,14 @@ function DashboardShell() {
                               <th className="p-3.5 text-right">가입 일시</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-800/60">
+                          <tbody className="divide-y divide-slate-100">
                             {usersList.map((u) => (
-                              <tr key={u.id} className="hover:bg-slate-800/20 transition-colors">
-                                <td className="p-3.5 font-mono font-bold text-cyan-400">{u.id}</td>
-                                <td className="p-3.5 font-bold text-white">{u.name}</td>
-                                <td className="p-3.5 text-slate-300 font-mono">{u.email}</td>
+                              <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="p-3.5 font-mono font-bold text-cyan-700">{u.id}</td>
+                                <td className="p-3.5 font-bold text-slate-900">{u.name}</td>
+                                <td className="p-3.5 text-slate-600 font-mono">{u.email}</td>
                                 <td className="p-3.5">
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-100 text-slate-700 border border-slate-200">
                                     {u.auth_type}
                                   </span>
                                 </td>
@@ -468,7 +468,7 @@ function DashboardShell() {
                                   <select
                                     value={u.role}
                                     onChange={(e) => updateRoleMutation.mutate({ userId: u.id, role: e.target.value })}
-                                    className="px-2.5 py-1 bg-slate-950 border border-slate-700 rounded text-xs text-white focus:outline-none focus:border-cyan-400 cursor-pointer font-medium"
+                                    className="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs text-slate-900 focus:outline-none focus:border-cyan-600 cursor-pointer font-medium shadow-xs"
                                   >
                                     <option value="Admin">Admin (최고 관리자)</option>
                                     <option value="Operator">Operator (운영자)</option>
@@ -488,11 +488,11 @@ function DashboardShell() {
                 {/* Section 2: M2M API Keys Grid */}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h2 className="text-xs font-bold text-slate-200 tracking-wider uppercase font-mono flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                    <h2 className="text-xs font-bold text-slate-800 tracking-wider uppercase font-mono flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-cyan-600" />
                       2. M2M AI 에이전트 &amp; CI Scoped API Keys
                     </h2>
-                    <span className="text-xs text-slate-500 font-mono">{apiKeysList.length} Keys Registered</span>
+                    <span className="text-xs text-slate-500 font-mono font-medium">{apiKeysList.length} Keys Registered</span>
                   </div>
 
                   <StateBoundary
@@ -504,16 +504,16 @@ function DashboardShell() {
                     emptyAction={
                       <button
                         onClick={() => setIsApiKeyModalOpen(true)}
-                        className="px-3.5 py-1.5 bg-cyan-500 text-slate-950 rounded-lg text-xs font-bold"
+                        className="px-3.5 py-1.5 bg-cyan-600 text-white rounded-lg text-xs font-bold shadow-xs cursor-pointer"
                       >
                         + 첫 API Key 발급하기
                       </button>
                     }
                   >
-                    <div className="rounded-xl border border-slate-800 bg-slate-900/30 overflow-hidden shadow-sm">
+                    <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
                       <div className="overflow-x-auto">
                         <table className="w-full text-left text-xs">
-                          <thead className="bg-slate-900/90 text-slate-400 font-mono uppercase tracking-wider border-b border-slate-800">
+                          <thead className="bg-slate-50/90 text-slate-600 font-mono uppercase tracking-wider border-b border-slate-200 font-semibold">
                             <tr>
                               <th className="p-3.5">Key ID</th>
                               <th className="p-3.5">에이전트 / CI 서비스명</th>
@@ -524,18 +524,18 @@ function DashboardShell() {
                               <th className="p-3.5 text-center">관리</th>
                             </tr>
                           </thead>
-                          <tbody className="divide-y divide-slate-800/60">
+                          <tbody className="divide-y divide-slate-100">
                             {apiKeysList.map((k) => (
-                              <tr key={k.id} className="hover:bg-slate-800/20 transition-colors">
-                                <td className="p-3.5 font-mono font-bold text-cyan-400">{k.id}</td>
-                                <td className="p-3.5 font-bold text-white">{k.name}</td>
-                                <td className="p-3.5 font-mono text-slate-300">
-                                  <span className="bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-[11px]">
+                              <tr key={k.id} className="hover:bg-slate-50/80 transition-colors">
+                                <td className="p-3.5 font-mono font-bold text-cyan-700">{k.id}</td>
+                                <td className="p-3.5 font-bold text-slate-900">{k.name}</td>
+                                <td className="p-3.5 font-mono text-slate-600">
+                                  <span className="bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-[11px]">
                                     {k.key_prefix}...
                                   </span>
                                 </td>
                                 <td className="p-3.5 text-center">
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                                  <span className="px-2.5 py-0.5 rounded text-[10px] font-bold font-mono bg-slate-100 text-slate-800 border border-slate-200">
                                     {k.role}
                                   </span>
                                 </td>
@@ -543,8 +543,8 @@ function DashboardShell() {
                                   <span
                                     className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
                                       k.is_active
-                                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                                        : 'bg-rose-950 text-rose-400 border border-rose-800'
+                                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                        : 'bg-rose-50 text-rose-700 border border-rose-200'
                                     }`}
                                   >
                                     {k.is_active ? 'ACTIVE' : 'REVOKED'}
@@ -555,7 +555,7 @@ function DashboardShell() {
                                   {k.is_active && (
                                     <button
                                       onClick={() => revokeApiKeyMutation.mutate(k.id)}
-                                      className="px-2.5 py-1 bg-rose-950/60 hover:bg-rose-900/80 text-rose-300 border border-rose-800/80 rounded text-[11px] font-medium transition-colors cursor-pointer"
+                                      className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded text-[11px] font-medium transition-colors cursor-pointer"
                                     >
                                       비활성화
                                     </button>
@@ -581,10 +581,10 @@ function DashboardShell() {
           <div className="space-y-6 animate-in fade-in duration-300">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <div className="text-xs font-mono font-semibold text-cyan-400 uppercase mb-1">
+                <div className="text-xs font-mono font-bold text-cyan-700 uppercase mb-1">
                   RUST AXUM 0.8 LIVE BACKEND
                 </div>
-                <h1 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
+                <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
                   수주 및 배송 총괄 관리
                 </h1>
               </div>
@@ -593,33 +593,33 @@ function DashboardShell() {
                   href="http://127.0.0.1:8080/swagger-ui"
                   target="_blank"
                   rel="noreferrer"
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-xs font-medium rounded-xl text-slate-200 border border-slate-800 inline-flex items-center gap-1.5"
+                  className="px-4 py-2 bg-white hover:bg-slate-50 text-xs font-medium rounded-lg text-slate-700 border border-slate-200 inline-flex items-center gap-1.5 shadow-xs"
                 >
                   <span>OpenAPI Swagger</span>
                   <span>↗</span>
                 </a>
                 <button
                   onClick={() => setIsOrderModalOpen(true)}
-                  className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-xs font-bold rounded-xl text-slate-950 shadow-lg shadow-cyan-500/20 cursor-pointer"
+                  className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-xs font-bold rounded-lg text-white shadow-xs cursor-pointer transition-colors"
                 >
                   + 신규 수주 등록 (Zod 검증)
                 </button>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-wrap items-center justify-between gap-4">
+            <div className="p-4 bg-white border border-slate-200 rounded-xl flex flex-wrap items-center justify-between gap-4 shadow-xs">
               <div className="flex flex-wrap items-center gap-3">
                 <input
                   type="text"
                   placeholder="주문번호 또는 고객사 검색..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="px-3.5 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 w-64"
+                  className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-cyan-600 w-64"
                 />
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-cyan-400"
+                  className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-700 focus:outline-none focus:border-cyan-600"
                 >
                   <option value="전체">모든 상태</option>
                   <option value="결제완료">결제완료</option>
@@ -631,10 +631,10 @@ function DashboardShell() {
 
               {selectedIds.length > 0 && (
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-cyan-400 font-mono">{selectedIds.length}건 선택됨</span>
+                  <span className="text-xs text-cyan-700 font-mono font-semibold">{selectedIds.length}건 선택됨</span>
                   <button
                     onClick={handleBatchApprove}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg cursor-pointer"
+                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg cursor-pointer shadow-xs"
                   >
                     일괄 결제 승인
                   </button>
@@ -642,10 +642,10 @@ function DashboardShell() {
               )}
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/40 backdrop-blur-md overflow-hidden shadow-2xl">
+            <div className="rounded-xl border border-slate-200 bg-white overflow-hidden shadow-xs">
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-900 text-slate-400 font-mono uppercase tracking-wider border-b border-slate-800">
+                  <thead className="bg-slate-50 text-slate-600 font-mono uppercase tracking-wider border-b border-slate-200 font-semibold">
                     <tr>
                       <th className="p-4 w-10 text-center">
                         <input
@@ -655,7 +655,7 @@ function DashboardShell() {
                             if (selectedIds.length === ordersList.length) setSelectedIds([])
                             else setSelectedIds(ordersList.map((o) => o.id))
                           }}
-                          className="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-0"
+                          className="rounded bg-white border-slate-300 text-cyan-600 focus:ring-0 cursor-pointer"
                         />
                       </th>
                       <th className="p-4">주문번호</th>
@@ -668,9 +668,9 @@ function DashboardShell() {
                       <th className="p-4 text-center">작업</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60">
+                  <tbody className="divide-y divide-slate-100">
                     {ordersList.map((ord) => (
-                      <tr key={ord.id} className="hover:bg-slate-800/30 transition-colors">
+                      <tr key={ord.id} className="hover:bg-slate-50/80 transition-colors">
                         <td className="p-4 text-center">
                           <input
                             type="checkbox"
@@ -680,25 +680,25 @@ function DashboardShell() {
                                 prev.includes(ord.id) ? prev.filter((x) => x !== ord.id) : [...prev, ord.id]
                               )
                             }}
-                            className="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-0 cursor-pointer"
+                            className="rounded bg-white border-slate-300 text-cyan-600 focus:ring-0 cursor-pointer"
                           />
                         </td>
-                        <td className="p-4 font-mono font-bold text-cyan-400">{ord.id}</td>
-                        <td className="p-4 font-medium text-white">{ord.client}</td>
-                        <td className="p-4 text-slate-400">{ord.items}</td>
-                        <td className="p-4 text-right font-mono font-bold text-slate-200">
+                        <td className="p-4 font-mono font-bold text-cyan-700">{ord.id}</td>
+                        <td className="p-4 font-semibold text-slate-900">{ord.client}</td>
+                        <td className="p-4 text-slate-600">{ord.items}</td>
+                        <td className="p-4 text-right font-mono font-bold text-slate-900">
                           {ord.amount.toLocaleString()}원
                         </td>
                         <td className="p-4 text-center">
                           <span
                             className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
                               ord.status === '결제완료'
-                                ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                                 : ord.status === '배송준비'
-                                ? 'bg-amber-950 text-amber-400 border border-amber-800'
+                                ? 'bg-amber-50 text-amber-700 border border-amber-200'
                                 : ord.status === '출고완료'
-                                ? 'bg-blue-950 text-blue-400 border border-blue-800'
-                                : 'bg-rose-950 text-rose-400 border border-rose-800'
+                                ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                : 'bg-rose-50 text-rose-700 border border-rose-200'
                             }`}
                           >
                             {ord.status}
@@ -708,20 +708,20 @@ function DashboardShell() {
                           <span
                             className={`font-semibold ${
                               ord.priority === '높음'
-                                ? 'text-rose-400'
+                                ? 'text-rose-600 font-bold'
                                 : ord.priority === '보통'
-                                ? 'text-slate-300'
-                                : 'text-slate-500'
+                                ? 'text-slate-700'
+                                : 'text-slate-400'
                             }`}
                           >
                             {ord.priority}
                           </span>
                         </td>
-                        <td className="p-4 font-mono text-slate-400">{ord.created_at}</td>
+                        <td className="p-4 font-mono text-slate-500">{ord.created_at}</td>
                         <td className="p-4 text-center">
                           <button
                             onClick={() => setEditingOrder(ord)}
-                            className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-[11px] font-medium transition-colors cursor-pointer"
+                            className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded text-[11px] font-medium transition-colors cursor-pointer"
                           >
                             상태 수정
                           </button>
@@ -740,26 +740,26 @@ function DashboardShell() {
         {/* ========================================================================= */}
         {activeTab === 'saas' && (
           <div className="space-y-6 animate-in fade-in duration-300">
-            <h2 className="text-xl font-bold text-white">SaaS 운영 및 실시간 SIEM 감사 로그</h2>
-            <div className="p-6 rounded-2xl bg-slate-900/40 border border-slate-800 space-y-4">
-              <div className="font-semibold text-sm text-slate-200">Rust 백엔드 실시간 감사 이벤트</div>
-              <div className="divide-y divide-slate-800">
+            <h2 className="text-xl font-bold text-slate-900">SaaS 운영 및 실시간 SIEM 감사 로그</h2>
+            <div className="p-6 rounded-xl bg-white border border-slate-200 space-y-4 shadow-xs">
+              <div className="font-semibold text-sm text-slate-800">Rust 백엔드 실시간 감사 이벤트</div>
+              <div className="divide-y divide-slate-100">
                 {(auditQuery.data || []).map((log) => (
                   <div key={log.id} className="py-3 flex items-center justify-between text-xs">
                     <div className="flex items-center gap-3">
                       <span
-                        className={`px-2 py-0.5 rounded font-mono ${
+                        className={`px-2 py-0.5 rounded font-mono text-[11px] font-semibold ${
                           log.status === 'SUCCESS'
-                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                            : 'bg-rose-950 text-rose-400 border border-rose-800'
+                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                            : 'bg-rose-50 text-rose-700 border border-rose-200'
                         }`}
                       >
                         {log.status}
                       </span>
-                      <span className="font-semibold text-slate-300">{log.user_name}</span>
-                      <span className="text-slate-400">{log.action}</span>
+                      <span className="font-semibold text-slate-900">{log.user_name}</span>
+                      <span className="text-slate-600">{log.action}</span>
                     </div>
-                    <span className="text-slate-500 font-mono">{log.created_at}</span>
+                    <span className="text-slate-400 font-mono">{log.created_at}</span>
                   </div>
                 ))}
               </div>
@@ -771,11 +771,11 @@ function DashboardShell() {
         {/* TAB: CINEMATIC */}
         {/* ========================================================================= */}
         {activeTab === 'cinematic' && (
-          <div className="p-16 text-center space-y-4 bg-slate-900/40 rounded-2xl border border-slate-800">
-            <h2 className="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-              Autonomous Rust & React Vibe Matrix
+          <div className="p-16 text-center space-y-4 bg-white rounded-xl border border-slate-200 shadow-xs">
+            <h2 className="text-3xl font-black text-cyan-800">
+              Autonomous Rust &amp; React Vibe Matrix
             </h2>
-            <p className="text-sm text-slate-400">MicroVM 1ms 콜드스타트 + Axum 0.8 Zero-GC 아키텍처</p>
+            <p className="text-sm text-slate-600">MicroVM 1ms 콜드스타트 + Axum 0.8 Zero-GC 아키텍처</p>
           </div>
         )}
 
@@ -783,70 +783,70 @@ function DashboardShell() {
         {/* TAB: SERVICE */}
         {/* ========================================================================= */}
         {activeTab === 'service' && (
-          <div className="p-16 text-center space-y-4 bg-slate-900/40 rounded-2xl border border-slate-800">
-            <h2 className="text-3xl font-bold text-white">엔터프라이즈 사내 표준 플랫폼</h2>
-            <p className="text-sm text-slate-400">OpenAPI 3.1 ➔ TypeScript 100% 자동 타입 동기화 파이프라인</p>
+          <div className="p-16 text-center space-y-4 bg-white rounded-xl border border-slate-200 shadow-xs">
+            <h2 className="text-3xl font-bold text-slate-900">엔터프라이즈 사내 표준 플랫폼</h2>
+            <p className="text-sm text-slate-600">OpenAPI 3.1 ➔ TypeScript 100% 자동 타입 동기화 파이프라인</p>
           </div>
         )}
       </main>
 
       {/* Auth Modal (Login / SSO) */}
       {isAuthModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0B0F19] border border-slate-800 rounded-3xl w-full max-w-md p-7 space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-7 space-y-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h3 className="text-lg font-bold text-white">사내 엔터프라이즈 인증</h3>
-                <p className="text-xs text-slate-400 mt-0.5">역할(Role)에 맞는 계정을 선택하세요</p>
+                <h3 className="text-lg font-bold text-slate-900">사내 엔터프라이즈 인증</h3>
+                <p className="text-xs text-slate-500 mt-0.5">역할(Role)에 맞는 계정을 선택하세요</p>
               </div>
-              <button onClick={() => setIsAuthModalOpen(false)} className="text-slate-500 hover:text-white text-lg">✕</button>
+              <button onClick={() => setIsAuthModalOpen(false)} className="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">✕</button>
             </div>
 
             <div className="space-y-4">
               <div className="space-y-2.5">
                 <button
                   onClick={() => handleQuickLogin('admin@enterprise.local')}
-                  className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs flex items-center justify-between px-4 cursor-pointer shadow-lg shadow-purple-600/25 transition-all"
+                  className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-xs flex items-center justify-between px-4 cursor-pointer shadow-xs transition-all"
                 >
                   <span className="flex items-center gap-2">
                     <span>👑</span>
                     <span>최고 관리자 (Admin) 원클릭 로그인</span>
                   </span>
-                  <span className="text-[10px] font-mono opacity-80">전체 관제 권한</span>
+                  <span className="text-[10px] font-mono text-slate-300">전체 관제 권한</span>
                 </button>
 
                 <button
                   onClick={() => handleQuickLogin('operator@enterprise.local')}
-                  className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold rounded-xl text-xs flex items-center justify-between px-4 cursor-pointer transition-all"
+                  className="w-full py-3 bg-slate-50 hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold rounded-xl text-xs flex items-center justify-between px-4 cursor-pointer transition-all"
                 >
                   <span className="flex items-center gap-2">
                     <span>⚙️</span>
                     <span>운영 리드 (Operator) 로그인</span>
                   </span>
-                  <span className="text-[10px] font-mono text-slate-400">수주/출고 권한</span>
+                  <span className="text-[10px] font-mono text-slate-500">수주/출고 권한</span>
                 </button>
 
                 <button
                   onClick={() => handleQuickLogin('guest@enterprise.local')}
-                  className="w-full py-3 bg-slate-900/60 hover:bg-slate-800/60 text-slate-400 border border-slate-800 font-medium rounded-xl text-xs flex items-center justify-between px-4 cursor-pointer transition-all"
+                  className="w-full py-3 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 font-medium rounded-xl text-xs flex items-center justify-between px-4 cursor-pointer transition-all"
                 >
                   <span className="flex items-center gap-2">
                     <span>👁️</span>
                     <span>조회 전용 (Viewer) 로그인</span>
                   </span>
-                  <span className="text-[10px] font-mono text-slate-500">읽기 전용</span>
+                  <span className="text-[10px] font-mono text-slate-400">읽기 전용</span>
                 </button>
               </div>
 
               <div className="relative flex py-2 items-center">
-                <div className="flex-grow border-t border-slate-800"></div>
-                <span className="flex-shrink mx-3 text-slate-500 text-[11px] font-mono">또는 SSO 연동</span>
-                <div className="flex-grow border-t border-slate-800"></div>
+                <div className="flex-grow border-t border-slate-200"></div>
+                <span className="flex-shrink mx-3 text-slate-400 text-[11px] font-mono">또는 SSO 연동</span>
+                <div className="flex-grow border-t border-slate-200"></div>
               </div>
 
               <button
                 onClick={() => handleQuickLogin('admin@enterprise.local')}
-                className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-slate-300 font-medium rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer border border-slate-800"
+                className="w-full py-3 bg-white hover:bg-slate-50 text-slate-700 font-medium rounded-xl text-xs flex items-center justify-center gap-2 cursor-pointer border border-slate-200 shadow-xs"
               >
                 <span>🌐</span>
                 <span>Google Workspace / MS Entra SSO</span>
@@ -858,20 +858,20 @@ function DashboardShell() {
 
       {/* New API Key Modal */}
       {isApiKeyModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0B0F19] border border-slate-800 rounded-3xl w-full max-w-md p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-lg font-bold text-white">신규 M2M API Key 발급</h3>
-              <button onClick={() => setIsApiKeyModalOpen(false)} className="text-slate-500 hover:text-white text-lg">✕</button>
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-lg font-bold text-slate-900">신규 M2M API Key 발급</h3>
+              <button onClick={() => setIsApiKeyModalOpen(false)} className="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">✕</button>
             </div>
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1.5 font-medium">에이전트 / CI 서비스 명칭</label>
+                <label className="block text-slate-600 mb-1.5 font-medium">에이전트 / CI 서비스 명칭</label>
                 <input
                   id="apiKeyNameInput"
                   placeholder="예: Hermes Autonomous Worker Bot"
-                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-purple-500"
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-600"
                 />
               </div>
             </div>
@@ -879,7 +879,7 @@ function DashboardShell() {
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setIsApiKeyModalOpen(false)}
-                className="px-4 py-2.5 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-xs"
+                className="px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs cursor-pointer"
               >
                 취소
               </button>
@@ -890,7 +890,7 @@ function DashboardShell() {
                     createApiKeyMutation.mutate(input.value)
                   }
                 }}
-                className="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-purple-600/25 cursor-pointer"
+                className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs shadow-xs cursor-pointer"
               >
                 발급 완료
               </button>
@@ -901,32 +901,32 @@ function DashboardShell() {
 
       {/* Issued Raw API Key Reveal Popup */}
       {issuedRawKey && (
-        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0B0F19] border border-purple-800/80 rounded-3xl w-full max-w-lg p-7 space-y-5 shadow-2xl">
-            <div className="w-12 h-12 rounded-2xl bg-purple-950/80 border border-purple-800 text-purple-400 flex items-center justify-center text-xl font-bold">
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg p-7 space-y-5 shadow-2xl">
+            <div className="w-12 h-12 rounded-xl bg-cyan-50 border border-cyan-200 text-cyan-700 flex items-center justify-center text-xl font-bold">
               🔑
             </div>
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-white">M2M API Key가 발급되었습니다</h3>
-              <p className="text-xs text-rose-400">
+              <h3 className="text-lg font-bold text-slate-900">M2M API Key가 발급되었습니다</h3>
+              <p className="text-xs text-rose-600 font-medium">
                 보안을 위해 이 원시 키는 지금 단 한 번만 표시됩니다. 지금 복사하여 안전하게 보관하세요.
               </p>
             </div>
-            <div className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl font-mono text-xs text-cyan-400 break-all select-all flex items-center justify-between gap-3">
-              <span>{issuedRawKey}</span>
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs text-slate-900 break-all select-all flex items-center justify-between gap-3">
+              <span className="text-cyan-800 font-bold">{issuedRawKey}</span>
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(issuedRawKey)
                   toast.success('API Key가 복사되었습니다.')
                 }}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold shrink-0 cursor-pointer"
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold shrink-0 cursor-pointer shadow-xs"
               >
                 복사
               </button>
             </div>
             <button
               onClick={() => setIssuedRawKey(null)}
-              className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-purple-600/25 cursor-pointer"
+              className="w-full py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs shadow-xs cursor-pointer"
             >
               확인 및 닫기
             </button>
@@ -936,54 +936,54 @@ function DashboardShell() {
 
       {/* New Order Modal (Zod) */}
       {isOrderModalOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <form
             onSubmit={handleSubmit(onSubmitNewOrder)}
-            className="bg-[#0B0F19] border border-slate-800 rounded-3xl w-full max-w-lg p-7 space-y-5 shadow-2xl"
+            className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg p-7 space-y-5 shadow-2xl"
           >
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-lg font-bold text-white">신규 수주 등록 (Zod 검증)</h3>
-              <button type="button" onClick={() => setIsOrderModalOpen(false)} className="text-slate-500 hover:text-white text-lg">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-lg font-bold text-slate-900">신규 수주 등록 (Zod 검증)</h3>
+              <button type="button" onClick={() => setIsOrderModalOpen(false)} className="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">
                 ✕
               </button>
             </div>
 
             <div className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1">고객사명</label>
+                <label className="block text-slate-700 mb-1 font-medium">고객사명</label>
                 <input
                   {...register('client')}
                   placeholder="예: 엔트로피패러독스"
-                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-600"
                 />
-                {errors.client && <p className="text-rose-400 text-[11px] mt-1">{errors.client.message}</p>}
+                {errors.client && <p className="text-rose-600 text-[11px] mt-1">{errors.client.message}</p>}
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">품목 내역</label>
+                <label className="block text-slate-700 mb-1 font-medium">품목 내역</label>
                 <input
                   {...register('items')}
                   placeholder="예: AOT 가속 모듈 10EA"
-                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-600"
                 />
-                {errors.items && <p className="text-rose-400 text-[11px] mt-1">{errors.items.message}</p>}
+                {errors.items && <p className="text-rose-600 text-[11px] mt-1">{errors.items.message}</p>}
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">수주 금액 (원)</label>
+                <label className="block text-slate-700 mb-1 font-medium">수주 금액 (원)</label>
                 <input
                   type="number"
                   {...register('amount', { valueAsNumber: true })}
-                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white font-mono focus:outline-none focus:border-cyan-400"
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-slate-900 font-mono focus:outline-none focus:border-cyan-600"
                 />
-                {errors.amount && <p className="text-rose-400 text-[11px] mt-1">{errors.amount.message}</p>}
+                {errors.amount && <p className="text-rose-600 text-[11px] mt-1">{errors.amount.message}</p>}
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">우선순위</label>
+                <label className="block text-slate-700 mb-1 font-medium">우선순위</label>
                 <select
                   {...register('priority')}
-                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-600"
                 >
                   <option value="높음">높음</option>
                   <option value="보통">보통</option>
@@ -996,14 +996,14 @@ function DashboardShell() {
               <button
                 type="button"
                 onClick={() => setIsOrderModalOpen(false)}
-                className="px-4 py-2.5 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-xs"
+                className="px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs cursor-pointer"
               >
                 취소
               </button>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-slate-950 font-bold rounded-xl text-xs shadow-lg shadow-cyan-500/20"
+                className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs shadow-xs cursor-pointer"
               >
                 {isSubmitting ? '저장 중...' : 'DB에 등록 완료'}
               </button>
@@ -1014,29 +1014,29 @@ function DashboardShell() {
 
       {/* Edit Order Modal */}
       {editingOrder && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[#0B0F19] border border-slate-800 rounded-3xl w-full max-w-lg p-6 space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-lg font-bold text-white">수주 상태 변경 ({editingOrder.id})</h3>
-              <button onClick={() => setEditingOrder(null)} className="text-slate-500 hover:text-white text-lg">✕</button>
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-lg font-bold text-slate-900">수주 상태 변경 ({editingOrder.id})</h3>
+              <button onClick={() => setEditingOrder(null)} className="text-slate-400 hover:text-slate-700 text-lg cursor-pointer">✕</button>
             </div>
 
             <div className="space-y-4 text-xs">
               <div>
-                <label className="block text-slate-400 mb-1">고객사</label>
+                <label className="block text-slate-700 mb-1 font-medium">고객사</label>
                 <input
                   disabled
                   value={editingOrder.client}
-                  className="w-full p-3 bg-slate-950/60 border border-slate-800 rounded-xl text-slate-400"
+                  className="w-full p-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-400 mb-1">상태 변경</label>
+                <label className="block text-slate-700 mb-1 font-medium">상태 변경</label>
                 <select
                   value={editingOrder.status}
                   onChange={(e) => setEditingOrder({ ...editingOrder, status: e.target.value })}
-                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:outline-none focus:border-cyan-400"
+                  className="w-full p-3 bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:border-cyan-600"
                 >
                   <option value="결제완료">결제완료</option>
                   <option value="배송준비">배송준비</option>
@@ -1049,7 +1049,7 @@ function DashboardShell() {
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setEditingOrder(null)}
-                className="px-4 py-2.5 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-xs"
+                className="px-4 py-2.5 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl text-xs cursor-pointer"
               >
                 취소
               </button>
@@ -1060,7 +1060,7 @@ function DashboardShell() {
                     body: { status: editingOrder.status },
                   })
                 }}
-                className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-bold rounded-xl text-xs shadow-lg shadow-cyan-500/20"
+                className="px-5 py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white font-bold rounded-xl text-xs shadow-xs cursor-pointer"
               >
                 저장 완료
               </button>
