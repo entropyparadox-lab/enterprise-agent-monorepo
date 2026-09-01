@@ -1,1 +1,1 @@
-AGENTS.md
+docs/AGENT_GUIDE.md
