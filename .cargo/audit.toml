@@ -1,0 +1,4 @@
+[advisories]
+ignore = [
+    "RUSTSEC-2023-0071", # Marvin Attack in rsa: uncompiled transitive dependency via sqlx-mysql; backend exclusively uses SQLite
+]
